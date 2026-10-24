@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Responsibility of Trust</title>
+<style>
+  :root { --ink:#000; --muted:#6a6a6a; --rule:#e7e5e2; --orange:#d9480f; --soft:#f5f4f2; }
+  html[data-theme="dark"] { --ink:#f1f1ef; --muted:#9b9a97; --rule:#3a3a3a; --orange:#ff7a3d; --bg:#191919; --soft:#252525; }
+  html[data-theme="light"] { --bg:#ffffff; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; background: var(--bg, #ffffff); }
+  body {
+    padding: 8px 4px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+
+  /* ---------- LAYOUT ---------- */
+  .layout { max-width: 760px; margin: 0 auto; }
+  main { min-width: 0; }
+
+  /* ---------- STICKY TABS ---------- */
+  .tabs {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg, #ffffff);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .tabs ul { display: flex; gap: 24px; overflow-x: auto; scrollbar-width: none; }
+  .tabs ul::-webkit-scrollbar { display: none; }
+  .tabs a {
+    position: relative; display: block; white-space: nowrap;
+    padding: 12px 0;
+    font-size: 14px; line-height: 1.35;
+    color: var(--muted); text-decoration: none;
+    transition: color .15s ease;
+  }
+  .tabs a::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2px; background: var(--orange);
+    transform: scaleX(0); transition: transform .2s ease;
+  }
+  .tabs a:hover { color: var(--ink); }
+  .tabs a:hover::after { transform: scaleX(.4); }
+  .tabs a.active { color: var(--ink); font-weight: 600; }
+  .tabs a.active::after { transform: scaleX(1); }
+  .tabs a:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+  /* ---------- CONTENT ---------- */
+  section { scroll-margin-top: 56px; padding-bottom: 40px; }
+  h2 { font-size: 30px; line-height: 1.2; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  h3 { font-size: 20px; line-height: 1.3; font-weight: 600; margin: 32px 0 10px; }
+  p  { font-size: 16px; line-height: 1.65; margin: 0 0 14px; }
+  p.muted, figcaption { color: var(--muted); }
+  ul.bullets { list-style: disc; padding-left: 22px; margin: 0 0 14px; }
+  ul.bullets li { font-size: 16px; line-height: 1.65; margin-bottom: 4px; }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 0 0 40px; }
+  a.text-link.orange { color: var(--orange); } { color: var(--orange); }
+  .callout { background: var(--soft); border-left: 2px solid var(--orange); padding: 14px 16px; margin: 0 0 14px; border-radius: 0 4px 4px 0; }
+  .callout p { margin: 0; }
+
+  /* ---------- IMAGES ---------- */
+  figure { margin: 8px 0 20px; }
+  figure img { display: block; max-width: 100%; height: auto; border-radius: 4px; }
+  figcaption { font-size: 13px; margin-top: 8px; }
+  .img-ph {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    min-height: 200px; padding: 16px; border: 1px dashed var(--rule); border-radius: 4px;
+    color: var(--muted); font-size: 14px; background: var(--soft);
+  }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .tabs a, .tabs a::after { transition: none; } }
+   /* ---------- TEAM CARDS (zig-zag) ---------- */
+  .team { display: flex; flex-direction: column; gap: 36px; margin: 8px 0 20px; }
+
+  /* each member = photo column + bubble column. Odd members: photo on the LEFT */
+  .member {
+    display: grid;
+    grid-template-columns: 120px 1fr;          /* photo column width | bubble takes the rest */
+    grid-template-rows: 1fr auto auto auto 1fr; /* keeps photo+name centred next to the bubble */
+    column-gap: 24px;                           /* space between photo and bubble */
+    align-items: center;
+    text-align: center;
+  }
+  .bubble {
+    grid-column: 2; grid-row: 1 / span 5;
+    position: relative;
+    background: var(--soft); border: 1px solid var(--rule); border-radius: 14px;
+    padding: 18px 20px; margin: 0;
+  }
+  .bubble p { margin: 0; font-size: 15px; line-height: 1.55; text-align: left; }
+  .avatar {
+    grid-column: 1; grid-row: 2; justify-self: center;
+    width: 88px; height: 88px; border-radius: 50%; object-fit: cover; display: block;
+    border: 2px solid var(--orange); margin-bottom: 10px;
+  }
+  .avatar-ph {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--soft); color: var(--muted); font-size: 12px;
+  }
+  .member .name { grid-column: 1; grid-row: 3; font-size: 18px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0; }
+ 
+  /* pointer on the bubble, aimed at the photo (left side) */
+  .bubble::before, .bubble::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); border-style: solid; border-color: transparent; }
+  .bubble::before { left: -11px; border-width: 11px 11px 11px 0; border-right-color: var(--rule); }
+  .bubble::after  { left: -9px;  border-width: 10px 10px 10px 0; border-right-color: var(--soft); }
+
+  /* even members (2nd, 4th...): photo on the RIGHT */
+  .member:nth-child(even) { grid-template-columns: 1fr 120px; }
+  .member:nth-child(even) .bubble { grid-column: 1; }
+  .member:nth-child(even) .avatar,
+  .member:nth-child(even) .name,
+  .member:nth-child(even) .role { grid-column: 2; }
+  .member:nth-child(even) .bubble::before { left: auto; right: -11px; border-width: 11px 0 11px 11px; border-color: transparent transparent transparent var(--rule); }
+  .member:nth-child(even) .bubble::after  { left: auto; right: -9px;  border-width: 10px 0 10px 10px; border-color: transparent transparent transparent var(--soft); }
+
+  /* smaller photo column on phones */
+  @media (max-width: 640px) {
+    .member { grid-template-columns: 90px 1fr; column-gap: 16px; }
+    .member:nth-child(even) { grid-template-columns: 1fr 90px; }
+    .avatar { width: 120px; height: 120px; }
+  }
+  /* ---------- IMAGES INSIDE BUBBLES ---------- */
+  .bubble img {
+    display: block;          
+    max-width: 100%;         /* never wider than the bubble */
+    width: 50%;              /* SIZE: change this (e.g. 50%, 80%, 100%, or 300px) */
+    height: auto;            /* keeps the picture's proportions */
+    margin: 16px auto 0 auto;      /* ALIGNMENT: top gap, then left-aligned */
+    border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- Tabs are built automatically from the main (h2) headings in <main> -->
+  <nav class="tabs" aria-label="Page sections"><ul id="nav"></ul></nav>
+
+  <main>
+
+    <!-- ============ 1. THE WORLD WE WANT ============ -->
+    <section id="world">
+      <h2>The world we want</h2>
+      <p><span style="color:#f5f4f2;">The World Economic Forum</span> describes a "flourishing world" as one in which <strong>sustainable economic development</strong> does not leave nature behind, in which <strong>individual gain and collective societal progress are mutually reinforcing</strong>, in which freedom, equity and human rights are <strong>undisputable principles</strong>, and in which governments <strong>facilitate, convene and 
+empower</strong> other stakeholders to shape the future.</p>
+     
+
+      <!-- IMAGE: replace the grey box below with the <img> snippet (see the guide) -->
+      <figure>
+       <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/sk1.png?raw=true"        
+      </figure>
+<hr>
+
+<h2>What stands in our way?</h2>
+<p>Today, <strong>profit often takes precedence</strong> over people, powerful institutions <strong>escape accountability</strong>, and economic growth continues to <strong>strain our planet</strong>. Digital products use <strong>dark patterns</strong> to influence our choices, while <strong>opaque systems, unequal opportunities</strong>, and <strong>barriers to access</strong> leave many people behind.</p>
+
+<p>As consumption grows and human autonomy is compromised, the progress we celebrate often comes with costs that remain <strong>unseen or unequally shared</strong>.</p>
+<figure>
+<img src="https://github.com/tanaya-kulkarni/DRD/blob/main/sk2.png?raw=true"
+</figure>
+<hr>
+<p><h3>Hmm..That seems like a lot. Are you sure designers can change things around here?</h3></p>
+
+<p>Find out what the team thinks!</p>
+
+    </section>
+
+    <hr>
+
+    <!-- ============ 2. TEAM THOUGHTS ============ -->
+    <section id="team">
+      <h2>Team Thoughts</h2>
+      <p>Our learnings and realisations from the module about designing in an imperfect world.</p>
+<hr>
+                <div class="team">
+
+        <div class="member">
+          <div class="bubble"><p>As a designer in a largely profit-driven society, advocating for users always felt like it would be an uphill battle. I believed most trade offs would compromise on user needs, rather than business goals. While this remains partially true, I am also able to see how taking company, market and user needs into account can possibly pave the way towards a shared interest. A small ethical change can be the start of a responsibly designed world.</p>
+<figure>
+<img src="https://github.com/tanaya-kulkarni/DRD/blob/main/meme1.jpeg?raw=true"
+</figure></div>
+          <img class="avatar" src= https://github.com/tanaya-kulkarni/DRD/blob/main/pfp.jpeg?raw=true</div>
+          <p class="name">Tanaya</p>
+         
+        </div>
+
+        <div class="member">
+          <div class="bubble"><p>Write member two's opinion here.</p></div>
+          <div class="avatar avatar-ph">Photo</div>
+          <p class="name">Dhun</p>
+         
+        </div>
+
+        <div class="member">
+          <div class="bubble"><p>Write member three's opinion here.</p></div>
+          <div class="avatar avatar-ph">Photo</div>
+          <p class="name">Siddhi</p>
+                 </div>
+
+      </div>
+  </section>
+
+    <hr>
+
+    <!-- ============ 3. THE FOCAL POINT ============ -->
+    <section id="focal">
+      <h2>The Focal Point</h2>
+      <div class="callout"><p>Write the single key idea or focus statement here.</p></div>
+      <p>Add supporting text here.</p>
+
+      <figure>
+        <div class="img-ph">Image goes here</div>
+        <figcaption>Optional caption</figcaption>
+      </figure>
+    </section>
+
+    <hr>
+
+    <!-- ============ 4. OUR POINT OF VIEW ============ -->
+    <section id="pov">
+      <h2>Our Point of View</h2>
+      <p>Write a short overview of your point of view here. The three parts below go deeper.</p>
+
+      <!-- 4a -->
+      <section id="information-trust">
+        <h3>Information x Trust</h3>
+        <p>Write your text here.</p>
+        <figure>
+          <div class="img-ph">Image goes here</div>
+          <figcaption>Optional caption</figcaption>
+        </figure>
+      </section>
+
+      <!-- 4b -->
+      <section id="people-planet-purpose">
+        <h3>People, Planet, Purpose</h3>
+        <p>Write your text here.</p>
+        <figure>
+          <div class="img-ph">Image goes here</div>
+          <figcaption>Optional caption</figcaption>
+        </figure>
+      </section>
+
+      <!-- 4c -->
+      <section id="principles">
+        <h3>Human-centered Principles</h3>
+        <p>Write your text here.</p>
+        <ul class="bullets">
+          <li>Principle one</li>
+          <li>Principle two</li>
+          <li>Principle three</li>
+        </ul>
+      </section>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  // ---- EDIT HERE ----------------------------------------------------------
+  var THEME = "dark"; // "dark" matches Notion dark mode, "light" for light mode
+  // -------------------------------------------------------------------------
+  document.documentElement.setAttribute("data-theme", THEME);
+
+  // Build the tabs from the main headings only (<h2>). <h3> sub-sections are not tabs.
+  var root = document.getElementById("nav");
+  var bar = document.querySelector(".tabs");
+  var links = [], targets = [];
+  var locked = false, lockTimer;
+
+  function setActive(a) {
+    links.forEach(function (l) { l.classList.remove("active"); l.removeAttribute("aria-current"); });
+    a.classList.add("active"); a.setAttribute("aria-current", "true");
+    // keep the active tab visible when the tab row scrolls sideways (small screens)
+    if (root.scrollWidth > root.clientWidth) { root.scrollLeft = a.offsetLeft - 16; }
+  }
+
+  function goTo(sec) {
+    var y = sec.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop) - bar.offsetHeight - 8;
+    window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+  }
+
+  document.querySelectorAll("main h2").forEach(function (h) {
+    var sec = h.closest("section");
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.textContent = h.textContent;
+    a.href = "#" + sec.id;
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      locked = true;                       // pause scroll-spy while the page glides to the section
+      clearTimeout(lockTimer);
+      lockTimer = setTimeout(function () { locked = false; }, 900);
+      setActive(a);
+      goTo(sec);
+    });
+    li.appendChild(a);
+    root.appendChild(li);
+    links.push(a); targets.push(sec);
+  });
+
+  // Highlight the tab for the section currently in view.
+  function onScroll() {
+    if (locked) return;
+    var current = 0;
+    targets.forEach(function (t, i) { if (t.getBoundingClientRect().top < window.innerHeight * 0.35) current = i; });
+    if (links[current]) setActive(links[current]);
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+</body>
+</html>
