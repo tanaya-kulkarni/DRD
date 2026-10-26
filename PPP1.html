@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responsible by design</title>
+<style>
+  :root { --ink:#000; --muted:#6a6a6a; --rule:#e7e5e2; --orange:#d9480f; --soft:#f5f4f2; }
+  html[data-theme="dark"] { --ink:#f1f1ef; --muted:#9b9a97; --rule:#3a3a3a; --orange:#ff7a3d; --bg:#191919; --soft:#252525; }
+  html[data-theme="light"] { --bg:#ffffff; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; background: var(--bg, #ffffff); }
+  body {
+    padding: 8px 4px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+
+  /* ---------- LAYOUT ---------- */
+  .layout { max-width: 760px; margin: 0 auto; }
+
+  /* ---------- STICKY TABS ---------- */
+  .tabs {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg, #ffffff);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .tabs ul { display: flex; gap: 24px; overflow-x: auto; scrollbar-width: none; }
+  .tabs ul::-webkit-scrollbar { display: none; }
+  .tabs a {
+    position: relative; display: block; white-space: nowrap;
+    padding: 12px 0; font-size: 14px; line-height: 1.35;
+    color: var(--muted); text-decoration: none; transition: color .15s ease;
+  }
+  .tabs a::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2px; background: var(--orange);
+    transform: scaleX(0); transition: transform .2s ease;
+  }
+  .tabs a:hover { color: var(--ink); }
+  .tabs a:hover::after { transform: scaleX(.4); }
+  .tabs a.active { color: var(--ink); font-weight: 600; }
+  .tabs a.active::after { transform: scaleX(1); }
+  .tabs a:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+  /* ---------- CONTENT ---------- */
+  section { scroll-margin-top: 56px; padding-bottom: 40px; }
+  h2 { font-size: 30px; line-height: 1.2; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  h3 { font-size: 20px; line-height: 1.3; font-weight: 600; margin: 32px 0 10px; }
+  p  { font-size: 16px; line-height: 1.65; margin: 0 0 14px; }
+  p.muted, figcaption { color: var(--muted); }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 0 0 40px; }
+  .callout { background: var(--soft); border-left: 2px solid var(--orange); padding: 14px 16px; margin: 20px 0 14px; border-radius: 0 4px 4px 0; }
+  .callout p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* ---------- EVIDENCE GALLERY ---------- */
+  .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 16px 0 8px; }
+  figure { margin: 0; }
+  figure img { display: block; width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--rule); }
+  figcaption { font-size: 13px; margin-top: 8px; }
+  .img-ph {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    aspect-ratio: 9 / 16; padding: 16px;
+    border: 1px dashed var(--rule); border-radius: 4px;
+    color: var(--muted); font-size: 14px; background: var(--soft);
+  }
+
+
+  /* ---------- EXAMPLE: SCREENSHOTS LEFT, TEXT RIGHT ---------- */
+  .example { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: start; margin: 8px 0 36px; }
+  .example .gallery { margin: 0; gap: 10px; }
+.example .gallery { grid-template-columns: 1fr; }          /* screenshots sit in the left column */
+  .example .text p { margin: 0 0 14px; }
+  .pills { display: flex; flex-direction: column; gap: 8px; }
+  .pills li {
+    position: relative;
+    background: var(--soft); border: 1px solid var(--rule);
+    border-radius: 14px;                                /* 999px = fully rounded pill */
+    padding: 9px 14px 9px 30px;
+    font-size: 15px; line-height: 1.5;
+  }
+  .pills li::before {
+    content: ""; position: absolute; left: 13px; top: 16px;
+    width: 8px; height: 8px; border-radius: 50%; background: var(--orange);
+  }
+
+  /* ---------- PEOPLE / PLANET / PURPOSE ---------- */
+  .question { font-size: 20px; font-weight: 600; line-height: 1.3; margin: 32px 0 10px; }
+  .needs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 28px 0 8px; align-items: start; }
+  .need { text-align: center; }
+  .circle {
+    width: 132px; height: 132px; max-width: 100%;
+    margin: 0 auto 10px; border-radius: 50%;
+    border: 2px solid var(--orange);
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+    background: var(--soft); color: var(--muted); font-size: 12px;
+  }
+  .circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .need .name { font-size: 18px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 14px; }
+
+  /* needs sit in a bubble that points up at the circle */
+  .bubble {
+    position: relative; text-align: left;
+    background: var(--soft); border: 1px solid var(--rule); border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .bubble::before, .bubble::after {
+    content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+    border-style: solid; border-color: transparent;
+  }
+  .bubble::before { top: -11px; border-width: 0 11px 11px 11px; border-bottom-color: var(--rule); }
+  .bubble::after  { top: -9px;  border-width: 0 10px 10px 10px; border-bottom-color: var(--soft); }
+  .bubble ul { list-style: disc; padding-left: 18px; }
+  .bubble li { font-size: 15px; line-height: 1.55; margin-bottom: 6px; }
+  .bubble li:last-child { margin-bottom: 0; }
+
+  @media (max-width: 640px) {
+    .gallery { grid-template-columns: 1fr; }
+    .example { grid-template-columns: 1fr; gap: 16px; }
+    .example .gallery { grid-template-columns: repeat(2, 1fr); }
+    .needs { grid-template-columns: 1fr; gap: 32px; }
+    .circle { width: 120px; height: 120px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .tabs a, .tabs a::after { transition: none; } }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="tabs" aria-label="Page sections"><ul id="nav"></ul></nav>
+
+  <main>
+
+    <!-- ============ 1. UNDERSTANDING THE WHY ============ -->
+    <section id="why">
+      <h2>Understanding the why</h2>
+<div class="callout"><p>In the previous section,while we were able to identify dark patterns and some questionable practices, we also thought it was important to understand what led to these decisions in the first place. Hence, we start this section by trying to understand the "why" behind some of the dark patterns.</p></div>
+
+      <!-- ===== EXAMPLE 1 ===== -->
+      <h3>Misleading marketing copy</h3>
+      <div class="example">
+        <div class="gallery">
+          <!-- TO ADD A SCREENSHOT: replace <div class="img-ph">…</div> with <img src="YOUR-IMAGE-URL" alt="…"> -->
+          <figure>
+            <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/marketingss1.jpeg?raw=true">
+            <figcaption>Inviting banners promising savings</figcaption>
+          </figure>
+         
+        </div>
+        <div class="text">
+          <p>From <strong>“Framing of Information”</strong>, we found that UI copies tended to rephrase terms, when they had to be shown directly to users. Why might marketing teams frame a service more favourably than its terms allow?</p>
+          <ul class="pills">
+            <li>Perhaps technical, restrictive language is seen as a barrier to attracting users.</li>
+            <li>The company may prioritise a clear, appealing message over communicating every limitation upfront.</li>
+            <li>Campaigns may be optimised for sign-ups and conversions, creating pressure to emphasise benefits over conditions.</li>
+          </ul>
+        </div>
+      </div>
+<hr>
+
+      <!-- ===== EXAMPLE 2 (same layout, copy it for more examples) ===== -->
+      <h3>Low visibility of terms</h3>
+      <div class="example">
+        <div class="gallery">
+          <figure>
+            <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/access1.jpeg?raw=true">
+            <figcaption>Very small font mentioning consent to T&C.</figcaption>
+          </figure>
+          <figure>
+            <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/access2.jpeg?raw=true">
+            <figcaption>Close-up of the low-contrast text.</figcaption>
+          </figure>
+        </div>
+        <div class="text">
+          <p>From <strong>"Display of Information"</strong>, we noticed mentions of the privacy policy, terms and conditions made deliberately small and with low contrast.Why might such important terms be displayed in small text or with low contrast?</p>
+          <ul class="pills">
+            <li>Perhaps making them less prominent is seen as a way to keep the user journey simple and uninterrupted.</li>
+<li>Designers may struggle to fit extensive legal information into an already crowded screen.</li>
+<li>Making terms less prominent may help reduce drop-offs during onboarding or transactions.</li>
+          </ul>
+        </div>
+      </div>
+
+<hr>
+      <h3>Where good intentions can go wrong</h3>
+
+      <p>These decisions may begin with seemingly reasonable goals: <strong>attracting users</strong> or <strong>reducing friction</strong>. But when those goals take priority over <strong>informed choice</strong>, they can undermine trust.</p>
+
+<p>Understanding the pressures a company faces doesn’t justify every decision. It helps us recognise what drives these practices and where change might begin.</p>
+
+      <div class="callout"><p>These are our speculations about how these decisions were taken. They are not representative of Phonepe’s actual workings in any way.</p></div>
+    </section>
+
+    <hr>
+
+    <!-- ============ 2. A PURPOSEFUL SHIFT ============ -->
+    <section id="shift">
+      <h2>A "purposeful" shift</h2>
+      <p>Many of these practices can emerge when <strong>financial growth and business metrics take precedence</strong> over other responsibilities.</p>
+      
+
+      <p class="question"> So, we asked, <strong>What does a company need to prioritise to create products that are responsible by design?</strong></p>
+      <p>We explore this through three essential needs: <strong>People</strong>, <strong>Planet</strong>, and <strong>Purpose</strong>.</p>
+
+      <div class="needs">
+        <!-- TO ADD YOUR ARTWORK: replace the text inside <div class="circle"> with
+             <img src="YOUR-IMAGE-URL" alt="People"> -->
+        <article class="need">
+          <div class="circle">Image</div>
+          <p class="name">People</p>
+          <div class="bubble"><ul>
+            <li>First need goes here</li>
+            <li>Second need goes here</li>
+            <li>Third need goes here</li>
+          </ul></div>
+        </article>
+
+        <article class="need">
+          <div class="circle">Image</div>
+          <p class="name">Planet</p>
+          <div class="bubble"><ul>
+            <li>First need goes here</li>
+            <li>Second need goes here</li>
+            <li>Third need goes here</li>
+          </ul></div>
+        </article>
+
+        <article class="need">
+          <div class="circle">Image</div>
+          <p class="name">Purpose</p>
+          <div class="bubble"><ul>
+            <li>First need goes here</li>
+            <li>Second need goes here</li>
+            <li>Third need goes here</li>
+          </ul></div>
+        </article>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  // ---- EDIT HERE: "light" or "dark" to match your Notion page ----
+  var THEME = "dark";
+  // -----------------------------------------------------------------
+  document.documentElement.setAttribute("data-theme", THEME);
+
+  // Tabs are built from the h2 headings
+  var root = document.getElementById("nav");
+  var bar = document.querySelector(".tabs");
+  var links = [], secs = [];
+
+  document.querySelectorAll("main h2").forEach(function (h) {
+    var sec = h.closest("section");
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.textContent = h.textContent;
+    a.href = "#" + sec.id;
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var y = sec.getBoundingClientRect().top + window.pageYOffset - bar.offsetHeight - 8;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    });
+    li.appendChild(a); root.appendChild(li);
+    links.push(a); secs.push(sec);
+  });
+
+  function spy() {
+    var line = bar.offsetHeight + 24, current = 0;
+    secs.forEach(function (s, i) { if (s.getBoundingClientRect().top <= line) current = i; });
+    links.forEach(function (l, i) { l.classList.toggle("active", i === current); });
+  }
+  window.addEventListener("scroll", spy, { passive: true });
+  spy();
+})();
+</script>
+</body>
+</html>
