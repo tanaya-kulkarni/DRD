@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Responsible by design</title>
+<style>
+  :root { --ink:#000; --muted:#6a6a6a; --rule:#e7e5e2; --orange:#d9480f; --soft:#f5f4f2; }
+  html[data-theme="dark"] { --ink:#f1f1ef; --muted:#9b9a97; --rule:#3a3a3a; --orange:#ff7a3d; --bg:#191919; --soft:#252525; --people:  #b7d3e3;   /* blue  */
+--planet:  #7a9e8b;   /* green */
+--purpose: #f2cfc9;   /* pink  */ }
+  html[data-theme="light"] { --bg:#ffffff; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; background: var(--bg, #ffffff); }
+  body {
+    padding: 8px 4px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+
+  /* ---------- LAYOUT ---------- */
+  .layout { max-width: 760px; margin: 0 auto; }
+
+  /* ---------- STICKY TABS ---------- */
+  .tabs {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg, #ffffff);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .tabs ul { display: flex; gap: 24px; overflow-x: auto; scrollbar-width: none; }
+  .tabs ul::-webkit-scrollbar { display: none; }
+  .tabs a {
+    position: relative; display: block; white-space: nowrap;
+    padding: 12px 0; font-size: 14px; line-height: 1.35;
+    color: var(--muted); text-decoration: none; transition: color .15s ease;
+  }
+  .tabs a::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2px; background: var(--orange);
+    transform: scaleX(0); transition: transform .2s ease;
+  }
+  .tabs a:hover { color: var(--ink); }
+  .tabs a:hover::after { transform: scaleX(.4); }
+  .tabs a.active { color: var(--ink); font-weight: 600; }
+  .tabs a.active::after { transform: scaleX(1); }
+  .tabs a:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+  /* ---------- CONTENT ---------- */
+  section { scroll-margin-top: 56px; padding-bottom: 40px; }
+  h2 { font-size: 30px; line-height: 1.2; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+  h3 { font-size: 20px; line-height: 1.3; font-weight: 600; margin: 32px 0 10px; }
+  p  { font-size: 16px; line-height: 1.65; margin: 0 0 14px; }
+  p.muted, figcaption { color: var(--muted); }
+  hr { border: 0; border-top: 1px solid var(--rule); margin: 0 0 40px; }
+  .callout { background: var(--soft); border-left: 2px solid var(--orange); padding: 14px 16px; margin: 20px 0 14px; border-radius: 0 4px 4px 0; }
+  .callout p { margin: 0; font-size: 15px; color: var(--muted); }
+
+  /* ---------- EVIDENCE GALLERY ---------- */
+  .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 16px 0 8px; }
+  figure { margin: 0; }
+  figure img { display: block; width: 100%; height: auto; border-radius: 4px; border: 1px solid var(--rule); }
+  figcaption { font-size: 13px; margin-top: 8px; }
+  .img-ph {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    aspect-ratio: 9 / 16; padding: 16px;
+    border: 1px dashed var(--rule); border-radius: 4px;
+    color: var(--muted); font-size: 14px; background: var(--soft);
+  }
+
+
+  /* ---------- EXAMPLE: SCREENSHOTS LEFT, TEXT RIGHT ---------- */
+  .example { display: grid; grid-template-columns: 1.15fr 1fr; gap: 28px; align-items: start; margin: 8px 0 36px; }
+  .example .gallery { margin: 0; gap: 10px; }
+.example .gallery { grid-template-columns: 1fr; }          /* screenshots sit in the left column */
+  .example .text p { margin: 0 0 14px; }
+  .pills { display: flex; flex-direction: column; gap: 8px; }
+  .pills li {
+    position: relative;
+    background: var(--soft); border: 1px solid var(--rule);
+    border-radius: 14px;                                /* 999px = fully rounded pill */
+    padding: 9px 14px 9px 30px;
+    font-size: 15px; line-height: 1.5;
+  }
+  .pills li::before {
+    content: ""; position: absolute; left: 13px; top: 16px;
+    width: 8px; height: 8px; border-radius: 50%; background: var(--orange);
+  }
+
+  /* ---------- PEOPLE / PLANET / PURPOSE ---------- */
+  .question { font-size: 20px; font-weight: 600; line-height: 1.3; margin: 32px 0 10px; }
+  .needs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 28px 0 8px; align-items: start; }
+  .need { text-align: center; }
+  .circle {
+    width: 132px; height: 132px; max-width: 100%;
+    margin: 0 auto 10px; border-radius: 50%;
+    overflow: hidden; display: flex; align-items: center; justify-content: center;
+    background: var(--soft); color: var(--muted); font-size: 12px;
+  }
+  .circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .need .name { font-size: 18px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 14px; }
+.need.people  { --c: var(--people); }
+.need.planet  { --c: var(--planet); }
+.need.purpose { --c: var(--purpose); }
+
+  /* needs sit in a bubble that points up at the circle */
+  .bubble {
+    position: relative; text-align: left;
+    background: color-mix(in srgb, var(--c) 35%, white); border: 1px solid var(--c, var(--rule)); border-radius: 14px;
+    padding: 14px 16px;
+    color: #111;               /* bubble text color */
+  }
+  .bubble::before, .bubble::after {
+    content: ""; position: absolute; left: 50%; transform: translateX(-50%);
+    border-style: solid; border-color: transparent;
+  }
+  .bubble::before { top: -11px; border-width: 0 11px 11px 11px; border-bottom-color: var(--c, var(--rule)); }
+  .bubble::after  { top: -9px;  border-width: 0 10px 10px 10px; border-bottom-color: var(--c, var(--soft)); }
+  .bubble ul { list-style: disc; padding-left: 18px; }
+  .bubble li { font-size: 15px; line-height: 1.55; margin-bottom: 6px; }
+  .bubble li:last-child { margin-bottom: 0; }
+ /* ---------- RECOMMENDATIONS: SLIDING STRIP PANELS ---------- */
+  .drawers {
+    --n: 4;            /* number of panels (strips) */
+    --s: 44px;         /* width of each collapsed strip */
+    position: relative; height: 460px; margin: 24px 0 8px;
+    overflow: hidden; border: 1px solid var(--rule);
+  }
+  .panel {
+    position: absolute; top: 0; left: 0; bottom: 0; width: 100%;
+    color: #111; background: var(--panel-bg);
+    transition: transform .6s cubic-bezier(.7, 0, .2, 1);
+    box-shadow: -1px 0 0 rgba(0,0,0,.08);
+  }
+  .panel[data-side="left"]  { transform: translateX(calc(var(--i) * var(--s))); }
+  .panel[data-side="right"] { transform: translateX(calc(100% - (var(--n) - var(--i)) * var(--s))); }
+
+  /* panel colors: change these to restyle each strip */
+  .p-intro   { --panel-bg: #fbfaf6; color: #111; }
+  .p-people  { --panel-bg: var(--people); }
+.p-planet  { --panel-bg: var(--planet); }
+.p-purpose { --panel-bg: var(--purpose); }
+  html[data-theme="dark"] .p-intro { --panel-bg: #2a2a2a; color: #f1f1ef; }
+
+  .strip {
+    position: absolute; top: 0; left: 0; bottom: 0; width: var(--s);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding: 0 0 16px; border: 0; background: transparent; color: inherit;
+    cursor: pointer; font: inherit;
+  }
+  .strip span {
+    writing-mode: vertical-rl; transform: rotate(180deg);
+    font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  }
+  .panel.active .strip { cursor: default; }
+  .panel:not(.active) .strip:hover { background: rgba(0,0,0,.06); }
+  .strip:focus-visible { outline: 2px solid var(--orange); outline-offset: -3px; }
+
+  .content {
+    position: absolute; top: 0; bottom: 0; left: var(--s);
+    width: calc(100% - var(--n) * var(--s));
+    padding: 24px 24px 24px 12px; overflow-y: auto; z-index: 1;
+  }
+  .content h4 { font-size: 26px; line-height: 1.15; font-weight: 700; margin: 0 0 6px; letter-spacing: -.01em; }
+  .content .lead { font-size: 15px; margin: 0 0 14px; opacity: .8; }
+  .big { font-size: 34px; line-height: 1.1; font-weight: 500; text-transform: uppercase; letter-spacing: -.01em; margin: 0 0 12px; }
+  .rec { border-top: 1px solid rgba(0,0,0,.22); padding: 10px 0 12px; }
+  .rec b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+  .rec p { font-size: 15px; line-height: 1.5; margin: 0; }
+  .hint { font-size: 14px; opacity: .7; }
+
+  /* decorative squiggle (replace the <svg> with your own <img> if you like) */
+  .deco { position: absolute; right: 24px; bottom: 16px; width: 46%; max-width: 260px; opacity: .55; pointer-events: none; z-index: 0; }
+  .deco path { fill: none; stroke: #fff; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+
+  @media (max-width: 640px) {
+    .gallery { grid-template-columns: 1fr; }
+    .example { grid-template-columns: 1fr; gap: 16px; }
+    .example .gallery { grid-template-columns: repeat(2, 1fr); }
+    .needs { grid-template-columns: 1fr; gap: 32px; }
+    .circle { width: 120px; height: 120px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .tabs a, .tabs a::after { transition: none; } }
+
+  /* ---------- "GO TO NEXT SECTION" ARROW + HIDDEN SECTION ---------- */
+  .next-step {
+    display: flex; align-items: center; justify-content: flex-start; gap: 20px;
+    width: 100%; margin-top: 28px; padding: 20px 0 0;
+    background: none; border: 0; border-top: 1px solid var(--rule);
+    color: var(--ink); font: inherit; text-align: left; cursor: pointer;
+  }
+  .next-step .t { font-size: 18px; font-weight: 600; line-height: 1.35; max-width: 48ch; }
+  .next-step .arrow {
+    flex: none; width: 48px; height: 48px; border-radius: 50%;line-height: 1; padding-bottom: 3px; margin-left: auto; 
+    background: var(--orange); color: #fff; font-size: 30px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s ease;
+  }
+  .next-step:hover .arrow { transform: translateX(6px); }
+  .next-step:focus-visible, .back-link:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+  .back-link { background: none; border: 0; padding: 0; margin: 0 0 18px; font: inherit; font-size: 14px; color: var(--muted); cursor: pointer; }
+  .back-link:hover { color: var(--ink); }
+
+  /* =====================================================================
+     PITCH IT!  (paste at the end of the existing <style> block)
+     ===================================================================== */
+  #pitch {
+    --tabs-h: 44px;                      /* JS updates this to the real main-tab height */
+    --legal: var(--people);              /* Legal    = blue  */
+    --business: var(--planet);           /* Business = green */
+    --design: var(--purpose);            /* Design   = pink  */
+    --presenter: var(--orange);          /* Presenter = orange */
+  }
+  /* People/Planet/Purpose are only defined for dark mode in the base CSS,
+     so give light mode its own (softer) values, scoped to this section only. */
+  html[data-theme="light"] #pitch { --people:#9cc3d8; --planet:#8fb9a1; --purpose:#e8b3aa; }
+
+  #pitch .lens-legal    { --c: var(--legal); }
+  #pitch .lens-business { --c: var(--business); }
+  #pitch .lens-design   { --c: var(--design); }
+  #pitch .lens-presenter{ --c: var(--presenter); }
+
+  #pitch .back-link { display: inline-block; }
+  #pitch .pitch-intro { color: var(--muted); max-width: 60ch; }
+
+  /* ---------- Component 1: persona cards ---------- */
+  .lenses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0 8px; align-items: start; }
+.lenses img { display: block; width: 100%; height: auto; border-radius: 14px; }
+
+  /* ---------- Component 2: sticky recommendation switcher ---------- */
+  .pitch-subnav {
+    position: sticky; top: var(--tabs-h); z-index: 9;
+    background: var(--bg, #ffffff);
+    margin: 28px 0 0; padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .rec-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px;
+    background: var(--soft); border: 1px solid var(--rule); border-radius: 12px;
+  }
+  .rec-tab {
+    appearance: none; border: 0; background: transparent; cursor: pointer;
+    padding: 10px 12px; border-radius: 9px;
+    font: inherit; font-size: 14px; line-height: 1.3; color: var(--muted);
+    transition: background .2s ease, color .2s ease;
+  }
+  .rec-tab:hover { color: var(--ink); }
+  .rec-tab[aria-selected="true"] { background: var(--orange); color: #fff; font-weight: 600; }
+  .rec-tab:focus-visible, .rec-go:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+  .rec-tab .short { display: none; }
+
+  /* ---------- Component 3: recommendation + chat ---------- */
+  .rec-panel[hidden] { display: none; }
+  .rec-head { padding: 32px 0 4px; }
+  .rec-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin: 0 0 10px; }
+  .rec-headline { font-size: 30px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+
+  .chat { display: flex; flex-direction: column; gap: 18px; margin: 28px 0 8px; }
+  .msg { display: flex; align-items: flex-start; gap: 10px; max-width: 84%; --dx: -16px; }
+  .msg.me { align-self: flex-end; flex-direction: row-reverse; --dx: 16px; }
+  .avatar {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--c); color: #111; font-size: 13px; font-weight: 700; overflow: hidden;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .msg-body { min-width: 0; }
+  .who {
+    display: block; margin: 0 4px 5px;
+    font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  .me .who { text-align: right; }
+  .msg-bubble {
+    padding: 12px 16px; border-radius: 16px 16px 16px 4px;
+    background: color-mix(in srgb, var(--c) 20%, var(--bg, #ffffff));
+    border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+    color: var(--ink);
+  }
+  .me .msg-bubble { border-radius: 16px 16px 4px 16px; }
+  .msg-bubble p { font-size: 15px; line-height: 1.55; margin: 0 0 8px; }
+  .msg-bubble p:last-child { margin-bottom: 0; }
+
+  /* ---------- Component 4: takeaways ---------- */
+  .takeaways {
+    background: var(--soft); border: 1px solid var(--rule); border-left: 3px solid var(--orange);
+    border-radius: 0 14px 14px 0; padding: 18px 20px; margin: 32px 0 8px;
+  }
+  .takeaways .tk-title { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin: 0 0 10px; }
+  .takeaways ul { display: flex; flex-direction: column; gap: 8px; }
+  .takeaways li { position: relative; padding-left: 20px; font-size: 15px; line-height: 1.55; }
+  .takeaways li::before { content: ""; position: absolute; left: 3px; top: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); }
+  .rec-go {
+    display: inline-block; margin-top: 18px; padding: 0; background: none; border: 0;
+    font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer;
+  }
+  .rec-go:hover { color: var(--orange); }
+
+  /* ---------- scroll-triggered reveal (only active once JS adds .is-ready) ---------- */
+  @keyframes pitch-fade-up {
+    from { opacity: 0; transform: translate(var(--dx, 0), 14px); }
+    to   { opacity: 1; transform: translate(0, 0); }
+  }
+  #pitch.is-ready [data-reveal]:not(.is-in) { opacity: 0; }
+  #pitch.is-ready [data-reveal].is-in { animation: pitch-fade-up .5s cubic-bezier(.2, .7, .2, 1) both; }
+
+  @media (max-width: 640px) {
+    .lenses { gap: 8px; }
+    .rec-tab { padding: 10px 6px; }
+    .rec-tab .long { display: none; }
+    .rec-tab .short { display: inline; }
+    .rec-head { padding-top: 24px; }
+    .rec-headline { font-size: 24px; }
+    .msg { max-width: 95%; gap: 8px; }
+    .avatar { width: 28px; height: 28px; font-size: 12px; }
+    .takeaways { padding: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #pitch.is-ready [data-reveal]:not(.is-in) { opacity: 1; }
+    #pitch.is-ready [data-reveal].is-in { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="tabs" aria-label="Page sections"><ul id="nav"></ul></nav>
+
+  <main>
+
+    <!-- ============ 1. UNDERSTANDING THE WHY ============ -->
+    <section id="why">
+      <h2>Understanding the why</h2>
+<div class="callout"><p>In the previous section,while we were able to identify dark patterns and some questionable practices, we also thought it was important to understand what led to these decisions in the first place. Hence, we start this section by trying to understand the "why" behind some of the dark patterns.</p></div>
+
+      <!-- ===== EXAMPLE 1 ===== -->
+      <h3>Misleading marketing copy</h3>
+      <div class="example">
+        <div class="gallery">
+          <!-- TO ADD A SCREENSHOT: replace <div class="img-ph">…</div> with <img src="YOUR-IMAGE-URL" alt="…"> -->
+          <figure>
+            <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/marketingss1.jpeg?raw=true">
+            <figcaption>Inviting banners promising savings</figcaption>
+          </figure>
+         
+        </div>
+        <div class="text">
+          <p>From <strong>“Framing of Information”</strong>, we found that UI copies tended to rephrase terms, when they had to be shown directly to users. Why might marketing teams frame a service more favourably than its terms allow?</p>
+          <ul class="pills">
+            <li>Perhaps technical, restrictive language is seen as a barrier to attracting users.</li>
+            <li>The company may prioritise a clear, appealing message over communicating every limitation upfront.</li>
+            <li>Campaigns may be optimised for sign-ups and conversions, creating pressure to emphasise benefits over conditions.</li>
+          </ul>
+        </div>
+      </div>
+<hr>
+
+      <!-- ===== EXAMPLE 2 (same layout, copy it for more examples) ===== -->
+      <h3>Low visibility of terms</h3>
+      <div class="example">
+        <div class="gallery">
+          <figure>
+            <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/access1.jpeg?raw=true">
+            <figcaption>Very small font mentioning consent to T&C.</figcaption>
+          </figure>
+          <figure>
+            <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/access2.jpeg?raw=true">
+            <figcaption>Close-up of the low-contrast text.</figcaption>
+          </figure>
+        </div>
+        <div class="text">
+          <p>From <strong>"Display of Information"</strong>, we noticed mentions of the privacy policy, terms and conditions made deliberately small and with low contrast.Why might such important terms be displayed in small text or with low contrast?</p>
+          <ul class="pills">
+            <li>Perhaps making them less prominent is seen as a way to keep the user journey simple and uninterrupted.</li>
+<li>Designers may struggle to fit extensive legal information into an already crowded screen.</li>
+<li>Making terms less prominent may help reduce drop-offs during onboarding or transactions.</li>
+          </ul>
+        </div>
+      </div>
+
+<hr>
+      <h3>Where good intentions can go wrong</h3>
+
+      <p>These decisions may begin with seemingly reasonable goals: <strong>attracting users</strong> or <strong>reducing friction</strong>. But when those goals take priority over <strong>informed choice</strong>, they can undermine trust.</p>
+
+<p>Understanding the pressures a company faces doesn’t justify every decision. It helps us recognise what drives these practices and where change might begin.</p>
+
+      <div class="callout"><p>These are our speculations about how these decisions were taken. They are not representative of Phonepe’s actual workings in any way.</p></div>
+    </section>
+
+    <hr>
+
+    <!-- ============ 2. A PURPOSEFUL SHIFT ============ -->
+    <section id="shift">
+      <h2>A "purposeful" shift</h2>
+      <p>Many of these practices can emerge when <strong>financial growth and business metrics take precedence</strong> over other responsibilities.</p>
+      
+
+      <p class="question"> So, we asked, <strong>What does a company need to prioritise to create products that are responsible by design?</strong></p>
+      <p>We explore this through three essential needs: <strong>People</strong>, <strong>Planet</strong>, and <strong>Purpose</strong>.</p>
+
+      <div class="needs">
+        <!-- TO ADD YOUR ARTWORK: replace the text inside <div class="circle"> with
+             <img src="YOUR-IMAGE-URL" alt="People"> -->
+        <article class="need people">
+<div class="circle">
+          <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/people.jpg?raw=true"></div>
+          <p class="name">People</p>
+          <div class="bubble"><ul>
+            <li>User agency and flexibility in how my data gets used, tracked and shared with other platforms.</li>
+            <li>Equal opportunities for all to use services, inclusive of disabilities and special needs.</li>
+            <li>The right to informed consent to services, to exit with respect and to choose without manipulation.</li>
+          </ul></div>
+        </article>
+
+        <article class="need planet">
+         <div class="circle">
+<img src="https://github.com/tanaya-kulkarni/DRD/blob/main/planet.png?raw=true"></div>
+          <p class="name">Planet</p>
+          <div class="bubble"><ul>
+            <li>Clear pathways for recycling of hardware waste, to minimize environmental impact as well as manufacturing costs.</li>
+            <li>Conscious use of algorithms that can reduce energy usage for the same task.</li>
+            <li>Assessing impact of features and services with respect to the impact on company's carbon footprint, to prioritize and filter out extras.</li>
+          </ul></div>
+        </article>
+
+        <article class="need purpose">
+          <div class="circle">
+<img src="https://github.com/tanaya-kulkarni/DRD/blob/main/purpose.png?raw=true"></div>
+          <p class="name">Purpose</p>
+          <div class="bubble"><ul>
+            <li>Accountability of the platform as well as its partners in case of promises, promotions and faults.</li>
+            <li>Honest promotion of value to users rather than deceptive persuasion</li>
+            <li>Clarity and support when decisions are likely to affect users significantly./li>
+          </ul></div>
+        </article>
+      </div>
+    </section>
+
+<hr>
+<section id="recommend">
+      <h2>Recommending Change</h2>
+<p>The needs identified for People, Planet and Purpose also helped us establish recommendations for Phonepe to have alternate routes where dark patterns currently exist.</p>
+   
+      <p>Click a strip to slide it open and see the recommendations for each need.</p>
+
+      <!-- Each <section class="panel"> is one strip. To add a panel: copy one, give it the next --i number,
+           and change --n (number of panels) in the .drawers CSS rule. -->
+      <div class="drawers" id="drawers">
+      <section class="panel p-intro" style="--i:0">
+        <button class="strip" type="button" aria-label="Open Overview"><span>Overview</span></button>
+        <div class="content">
+          <p class="big">Responsible by design</p>
+          <p class="lead">Recommendations across People, Planet and Purpose.</p>
+          <p class="hint">Click a strip to open it.</p>
+        </div>
+      </section>
+      <section class="panel p-people" style="--i:1">
+        <button class="strip" type="button" aria-label="Open People"><span>People</span></button>
+        <div class="content">
+          <h4>People</h4>
+          <p class="lead">PhonePe makes it easy to sign up and share data, but hard to understand what happens to that data, to get help, or to leave.
+Our People recommendations put users back in control.</p>
+          <div class="rec"><b>Recommendation 1</b><p>Help users make informed financial decisions rather than focusing solely on engagement with services. </p></div>
+          <div class="rec"><b>Recommendation 2</b><p>Make service exits and account deactivation free from unnecessary friction. Introducing difficulties reduces user autonomy and leads to a loss of trust.</p></div>
+          <div class="rec"><b>Recommendation 3</b><p>Exploiting inactivity and human errors should be avoided at all costs. Transparency in consequences and reasoning for data usage is essential for long term trust.</p></div>
+          
+        </div>
+      </section>
+      <section class="panel p-planet" style="--i:2">
+        <button class="strip" type="button" aria-label="Open Planet"><span>Planet</span></button>
+        <div class="content">
+          <h4>Planet</h4>
+          <p class="lead">PhonePe runs on servers, stored data and physical devices, and much of it keeps running even when nobody is using it. Our Planet recommendations cut out what isn’t needed.</p>
+          <div class="rec"><b>Recommendation 1</b><p>Create clarity in recycling routes, with prompts and promotions that explain the process to regular hardware users.</p></div>
+          <div class="rec"><b>Recommendation 2</b><p>Penalties for inactive services create forced usage and long term data stagnancy. Reminders to users can help cut down extra running costs for Phonepe.</p></div>
+          <div class="rec"><b>Recommendation 3</b><p>Features like AI chatbots take up large amounts of energy, with low user engagement due to dead ends. Diverse query paths and anticipatory support can help make better use of these resources.</p></div>
+                  </div>
+      </section>
+      <section class="panel p-purpose" style="--i:3">
+        <button class="strip" type="button" aria-label="Open Purpose"><span>Purpose</span></button>
+        <div class="content">
+          <h4>Purpose</h4>
+          <p class="lead">PhonePe’s terms are mostly written to protect the platform: they limit its responsibility, keep important rules out of sight, and send users elsewhere when things go wrong.
+
+Our Purpose recommendations make PhonePe honest.</p>
+          <div class="rec"><b>Recommendation 1</b><p>Define the line between third party marketing and self promotion. Marketing of collaborators and Phonepe's services should be easy to differentiate.</p></div>
+          <div class="rec"><b>Recommendation 2</b><p>Updates and changes to terms that can affect users directly, deserve to be shown upfront. Timely information, in-app reminders and easy navigation through relevant terms should be essential aspects of the service. </p></div>
+          <div class="rec"><b>Recommendation 3</b><p>Accountability and clear distinction of responsibilities is integral to an aggregator like Phonepe. Users should not feel lost when reaching out for help.</p></div>
+          
+        </div>
+      </section>
+      </div>
+
+      <!-- Click-through to the next section -->
+      <button class="next-step" type="button" data-goto="pitch">
+        <span class="t">Find out how these recommendations survive (or don’t) if presented to a company in reality.</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </button>
+    </section>
+
+    <!-- ============ 4. PITCH IT! (hidden until the arrow or tab is clicked) ============ -->
+    <section id="pitch" data-gated hidden>
+
+      <h2>Pitch it!</h2>
+      <p>When we made recommendations based on the needs identified from People, Planet and Purpose, we couldn't help but wonder if they would still stand against the realities of a company. To reevaluate and strenghten our recommendations, we decided to bring the three lenses <strong>Ethical, Professional, and Design</strong> to our help. These then translated into 3 distinct departments in a company itself, as shown below.</p>
+
+      <!-- ===== Component 1: the three lenses =====
+           To add your avatars: replace the text inside each <div class="circle"> with
+           <img src="YOUR-IMAGE-URL" alt="Legal"> -->
+      <div class="lenses">
+  <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/Frame%2041.png?raw=true" alt="Legal persona card">
+  <img src="https://github.com/tanaya-kulkarni/DRD/blob/main/Frame%2042.png?raw=true" alt="Business persona card">
+  <a href="https://ibb.co/LhCJPd3P"><img src="https://i.ibb.co/Pz59YGdY/Frame-43.png" alt="Frame 43" border="0"></a>
+</div>
+<p>Now we explore how our recommendations could get questioned by each of them. Scroll to see how the conversation goes!
+
+<hr>
+
+      <!-- ===== Component 2: recommendation switcher ===== -->
+      <div class="pitch-subnav">
+        <div class="rec-tabs" role="tablist" aria-label="Recommendations">
+          <button class="rec-tab" type="button" role="tab" id="rtab-1" aria-controls="rpanel-1" aria-selected="true"><span class="long">Recommendation </span><span class="short">Rec </span>1</button>
+          <button class="rec-tab" type="button" role="tab" id="rtab-2" aria-controls="rpanel-2" aria-selected="false" tabindex="-1"><span class="long">Recommendation </span><span class="short">Rec </span>2</button>
+          <button class="rec-tab" type="button" role="tab" id="rtab-3" aria-controls="rpanel-3" aria-selected="false" tabindex="-1"><span class="long">Recommendation </span><span class="short">Rec </span>3</button>
+        </div>
+      </div>
+
+      <!-- Placeholder copy: edit the recommendation text and dialogue freely.
+           Message pattern (copy to add more):
+           <div class="msg lens-legal" data-reveal> ...  (use lens-business / lens-design / "me lens-presenter") -->
+
+      <!-- ============ RECOMMENDATION 1 ============ -->
+      <div class="rec-panel" id="rpanel-1" role="tabpanel" aria-labelledby="rtab-1">
+        <div class="rec-head">
+          <p class="rec-eyebrow">Recommendation 1 · People</p>
+          <p class="rec-headline">Make leaving as easy as joining: exits and account deactivation should be free from unnecessary friction.</p>
+        </div>
+
+        <div class="chat">
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Our first recommendation: a clear “Deactivate account” option, with no hidden menus and no support call required to leave.</p></div></div>
+          </div>
+          <div class="msg lens-legal" data-reveal>
+            <div class="avatar" aria-hidden="true">L</div>
+            <div class="msg-body"><span class="who">Legal</span>
+              <div class="msg-bubble"><p>Are we required to offer this, or is it a nice-to-have? And what about records we must keep for financial regulations?</p></div></div>
+          </div>
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Both can be true. Data protection principles point towards making withdrawal of consent as easy as giving it. Deactivation doesn’t have to mean deleting everything. We just need to say plainly what is retained, and why.</p></div></div>
+          </div>
+          <div class="msg lens-business" data-reveal>
+            <div class="avatar" aria-hidden="true">B</div>
+            <div class="msg-body"><span class="who">Business</span>
+              <div class="msg-bubble"><p>Every exit is a lost user. Why would we make leaving easier?</p></div></div>
+          </div>
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Forced retention isn’t loyalty. Users who know they can leave freely are more likely to join, and more likely to return.</p></div></div>
+          </div>
+          <div class="msg lens-design" data-reveal>
+            <div class="avatar" aria-hidden="true">D</div>
+            <div class="msg-body"><span class="who">Design</span>
+              <div class="msg-bubble"><p>We can offer a “pause instead” option without guilt-tripping. One screen: what happens to your data, balance and linked accounts, then a clear confirm button. Alternatives sit beside the exit, never in front of it.</p></div></div>
+          </div>
+          <div class="msg lens-legal" data-reveal>
+            <div class="avatar" aria-hidden="true">L</div>
+            <div class="msg-body"><span class="who">Legal</span>
+              <div class="msg-bubble"><p>I can support that, as long as the retention notice is accurate and reviewed.</p></div></div>
+          </div>
+        </div>
+
+        <div class="takeaways" data-reveal>
+          <p class="tk-title">Takeaways</p>
+          <ul>
+            <li>Legal’s concern is about <strong>what we keep and say</strong>, not about whether exits should exist.</li>
+            <li>Business objections soften when retention is reframed as <strong>trust</strong> rather than lock-in.</li>
+            <li>Design makes the compromise real: alternatives are offered <strong>beside</strong> the exit, never in its way.</li>
+          </ul>
+        </div>
+        <button class="rec-go" type="button" data-rec-go="2">Next: Recommendation 2 →</button>
+      </div>
+
+      <!-- ============ RECOMMENDATION 2 ============ -->
+      <div class="rec-panel" id="rpanel-2" role="tabpanel" aria-labelledby="rtab-2" hidden>
+        <div class="rec-head">
+          <p class="rec-eyebrow">Recommendation 2 · Planet</p>
+          <p class="rec-headline">Anticipate user problems and offer diverse query paths, so energy-hungry AI support isn’t spent on dead ends.</p>
+        </div>
+
+        <div class="chat">
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Chatbots use a lot of energy, yet users often hit a dead end and start over. We recommend surfacing likely issues first and giving the chatbot more ways to resolve a query.</p></div></div>
+          </div>
+          <div class="msg lens-business" data-reveal>
+            <div class="avatar" aria-hidden="true">B</div>
+            <div class="msg-body"><span class="who">Business</span>
+              <div class="msg-bubble"><p>Is this a sustainability project or a support-cost project? If engagement is low, why not simply remove the chatbot?</p></div></div>
+          </div>
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>It’s both, and removal just moves the problem. A dead end means the same issue is raised again, then escalated to a human. That is wasted compute and wasted support time.</p></div></div>
+          </div>
+          <div class="msg lens-design" data-reveal>
+            <div class="avatar" aria-hidden="true">D</div>
+            <div class="msg-body"><span class="who">Design</span>
+              <div class="msg-bubble"><p>Put the common problems up front, such as failed payments and refund status, so many people never need to type. The chatbot becomes the fallback, with a visible route to a human.</p></div></div>
+          </div>
+          <div class="msg lens-legal" data-reveal>
+            <div class="avatar" aria-hidden="true">L</div>
+            <div class="msg-body"><span class="who">Legal</span>
+              <div class="msg-bubble"><p>If the bot explains refunds or responsibility, the wording matters. Escalation paths and who answers for what need to be documented.</p></div></div>
+          </div>
+          <div class="msg lens-business" data-reveal>
+            <div class="avatar" aria-hidden="true">B</div>
+            <div class="msg-body"><span class="who">Business</span>
+              <div class="msg-bubble"><p>Can we measure whether it works?</p></div></div>
+          </div>
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Yes: queries per resolved issue, repeat-contact rate and handoff rate. Fewer retries means lower energy use and lower cost.</p></div></div>
+          </div>
+        </div>
+
+        <div class="takeaways" data-reveal>
+          <p class="tk-title">Takeaways</p>
+          <ul>
+            <li>Sustainability lands best when it is tied to a <strong>metric the business already tracks</strong>.</li>
+            <li>Preventing the problem beats optimising the chatbot that answers it.</li>
+            <li>A visible human handoff is good design <strong>and</strong> good risk management.</li>
+          </ul>
+        </div>
+        <button class="rec-go" type="button" data-rec-go="3">Next: Recommendation 3 →</button>
+      </div>
+
+      <!-- ============ RECOMMENDATION 3 ============ -->
+      <div class="rec-panel" id="rpanel-3" role="tabpanel" aria-labelledby="rtab-3" hidden>
+        <div class="rec-head">
+          <p class="rec-eyebrow">Recommendation 3 · Purpose</p>
+          <p class="rec-headline">Show changes to terms that affect users upfront: in the app, in good time, and in plain language.</p>
+        </div>
+
+        <div class="chat">
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>When terms change in ways that affect money, data or responsibility, users should be told in the app, not left to find out later.</p></div></div>
+          </div>
+          <div class="msg lens-legal" data-reveal>
+            <div class="avatar" aria-hidden="true">L</div>
+            <div class="msg-body"><span class="who">Legal</span>
+              <div class="msg-bubble"><p>We already publish updated terms on our website. Isn’t that enough?</p></div></div>
+          </div>
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Published isn’t the same as noticed. In our audit, links to terms sat in tiny, low-contrast text where almost nobody would read them.</p></div></div>
+          </div>
+          <div class="msg lens-business" data-reveal>
+            <div class="avatar" aria-hidden="true">B</div>
+            <div class="msg-body"><span class="who">Business</span>
+              <div class="msg-bubble"><p>A pop-up for every update hurts conversion and annoys people.</p></div></div>
+          </div>
+          <div class="msg lens-design" data-reveal>
+            <div class="avatar" aria-hidden="true">D</div>
+            <div class="msg-body"><span class="who">Design</span>
+              <div class="msg-bubble"><p>So we tier it. Interruptions are reserved for changes that touch money, data or liability. Everything else gets a dismissible notice and a short “what changed” summary.</p></div></div>
+          </div>
+          <div class="msg lens-legal" data-reveal>
+            <div class="avatar" aria-hidden="true">L</div>
+            <div class="msg-body"><span class="who">Legal</span>
+              <div class="msg-bubble"><p>I can work with a tiered approach if the full terms stay linked and dated.</p></div></div>
+          </div>
+          <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Then we agree: clear when it matters, quiet when it doesn’t.</p></div></div>
+          </div>
+        </div>
+
+        <div class="takeaways" data-reveal>
+          <p class="tk-title">Takeaways</p>
+          <ul>
+            <li>“We published it” is a <strong>legal</strong> position. “Users saw it” is a <strong>trust</strong> position.</li>
+            <li>Tiering notices answers Business’s fear of friction without hiding what matters.</li>
+            <li>Each lens changed the proposal, and the final version is stronger for it.</li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+
+
+
+
+  </main>
+</div>
+
+<script>
+(function () {
+  // ---- EDIT HERE: "light" or "dark" to match your Notion page ----
+  var THEME = "dark";
+  // -----------------------------------------------------------------
+  document.documentElement.setAttribute("data-theme", THEME);
+
+  // Tabs are built from the h2 headings
+  var root = document.getElementById("nav");
+  var bar = document.querySelector(".tabs");
+  var links = [], secs = [];
+
+  // Sections marked data-gated are in the tab bar but only open on click
+  var main = document.querySelector("main"), gated = null;
+  function openGated(sec) {
+    gated = sec;
+    Array.prototype.forEach.call(main.children, function (el) { el.hidden = (el !== sec); });
+    links.forEach(function (l, i) { l.classList.toggle("active", secs[i] === sec); });
+    window.scrollTo({ top: 0 });
+  }
+  function closeGated() {
+    if (!gated) return;
+    Array.prototype.forEach.call(main.children, function (el) { el.hidden = el.hasAttribute("data-gated"); });
+    gated = null;
+  }
+
+  document.querySelectorAll("main h2").forEach(function (h) {
+    var sec = h.closest("section");
+    var li = document.createElement("li");
+    var a = document.createElement("a");
+    a.textContent = h.textContent;
+    a.href = "#" + sec.id;
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (sec.hasAttribute("data-gated")) { openGated(sec); return; }
+      closeGated();
+      var y = sec.getBoundingClientRect().top + window.pageYOffset - bar.offsetHeight - 8;
+      window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+    });
+    li.appendChild(a); root.appendChild(li);
+    links.push(a); secs.push(sec);
+  });
+
+  function spy() {
+    if (gated) return;
+    var line = bar.offsetHeight + 24, current = 0;
+    secs.forEach(function (s, i) { if (!s.hidden && s.getBoundingClientRect().top <= line) current = i; });
+    links.forEach(function (l, i) { l.classList.toggle("active", i === current); });
+  }
+  window.addEventListener("scroll", spy, { passive: true });
+  spy();
+
+  // arrow button -> opens the hidden section; back link -> returns
+  document.querySelectorAll("[data-goto]").forEach(function (b) {
+    b.addEventListener("click", function () { openGated(document.getElementById(b.getAttribute("data-goto"))); });
+  });
+  document.querySelectorAll("[data-back]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      closeGated();
+      var sec = document.getElementById(b.getAttribute("data-back"));
+      window.scrollTo({ top: Math.max(0, sec.getBoundingClientRect().top + window.pageYOffset - bar.offsetHeight - 8) });
+      spy();
+    });
+  });
+})();
+(function () {
+  document.querySelectorAll(".drawers").forEach(function (box) {
+    var panels = Array.prototype.slice.call(box.querySelectorAll(".panel"));
+    box.style.setProperty("--n", panels.length);
+    panels.forEach(function (p, i) {
+      p.style.zIndex = i + 1;
+      p.querySelector(".strip").addEventListener("click", function () { go(i); });
+    });
+    function go(a) {
+      panels.forEach(function (p, i) {
+        p.setAttribute("data-side", i <= a ? "left" : "right");
+        p.classList.toggle("active", i === a);
+        p.querySelector(".strip").setAttribute("aria-expanded", i === a ? "true" : "false");
+        var c = p.querySelector(".content");
+        if (i === a) c.removeAttribute("inert"); else c.setAttribute("inert", "");
+      });
+    }
+    go(0);
+  });
+})();
+
+</script>
+<script>
+(function () {
+  var sec = document.getElementById("pitch");
+  if (!sec) return;
+  var tabs = Array.prototype.slice.call(sec.querySelectorAll(".rec-tab"));
+  var panels = Array.prototype.slice.call(sec.querySelectorAll(".rec-panel"));
+  var mainBar = document.querySelector(".tabs");
+  var subnav = sec.querySelector(".pitch-subnav");
+
+  // keep the sticky sub-nav directly under the main tab bar
+  function syncBar() { if (mainBar) sec.style.setProperty("--tabs-h", mainBar.offsetHeight + "px"); }
+  syncBar();
+  window.addEventListener("resize", syncBar);
+
+  // ---- recommendation switcher (does not touch the main document state) ----
+  function show(i, opts) {
+    opts = opts || {};
+    tabs.forEach(function (t, n) {
+      var on = n === i;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+      panels[n].hidden = !on;
+    });
+    if (opts.focus) tabs[i].focus();
+    // if the reader has scrolled past the top of the chat, bring them back to its start
+    var top = panels[i].getBoundingClientRect().top + window.pageYOffset
+            - (mainBar ? mainBar.offsetHeight : 0) - (subnav ? subnav.offsetHeight : 0) - 8;
+    if (window.pageYOffset > top) window.scrollTo({ top: Math.max(0, top) });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { show(i); });
+    t.addEventListener("keydown", function (e) {
+      var k = e.key, n = null;
+      if (k === "ArrowRight") n = (i + 1) % tabs.length;
+      else if (k === "ArrowLeft") n = (i - 1 + tabs.length) % tabs.length;
+      else if (k === "Home") n = 0;
+      else if (k === "End") n = tabs.length - 1;
+      if (n !== null) { e.preventDefault(); show(n, { focus: true }); }
+    });
+  });
+  sec.querySelectorAll("[data-rec-go]").forEach(function (b) {
+    b.addEventListener("click", function () { show(parseInt(b.getAttribute("data-rec-go"), 10) - 1); });
+  });
+
+  // ---- scroll-triggered reveal for messages and takeaways ----
+  var items = Array.prototype.slice.call(sec.querySelectorAll("[data-reveal]"));
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!("IntersectionObserver" in window) || reduce) {
+    items.forEach(function (el) { el.classList.add("is-in"); });   // no animation: show everything
+  } else {
+    sec.classList.add("is-ready");
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.15, rootMargin: "0px 0px -8% 0px" });
+    items.forEach(function (el) { io.observe(el); });   // hidden panels only reveal once opened; seen items stay revealed
+  }
+})();
+</script>
+</body>
+</html>
