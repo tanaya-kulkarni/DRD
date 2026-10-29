@@ -30,7 +30,7 @@
     border-bottom: 1px solid var(--rule);
     margin-bottom: 32px;
   }
-  .tabs ul { display: flex; gap: 24px; overflow-x: auto; scrollbar-width: none; }
+  .tabs ul { display: flex; gap: 72px; overflow-x: auto; scrollbar-width: none; }
   .tabs ul::-webkit-scrollbar { display: none; }
   .tabs a {
     position: relative; display: block; white-space: nowrap;
@@ -206,13 +206,13 @@
   /* =====================================================================
      PITCH IT!  (paste at the end of the existing <style> block)
      ===================================================================== */
-  #pitch {
-    --tabs-h: 44px;                      /* JS updates this to the real main-tab height */
-    --legal: var(--people);              /* Legal    = blue  */
-    --business: var(--planet);           /* Business = green */
-    --design: var(--purpose);            /* Design   = pink  */
-    --presenter: var(--orange);          /* Presenter = orange */
-  }
+#pitch {
+  --tabs-h: 44px;
+  --legal: #BBA4E9;
+  --business: #FEBD8D;
+  --design: #9BAF96;
+  --presenter: #78C0D6;
+}
   /* People/Planet/Purpose are only defined for dark mode in the base CSS,
      so give light mode its own (softer) values, scoped to this section only. */
   html[data-theme="light"] #pitch { --people:#9cc3d8; --planet:#8fb9a1; --purpose:#e8b3aa; }
@@ -226,7 +226,7 @@
   #pitch .pitch-intro { color: var(--muted); max-width: 60ch; }
 
   /* ---------- Component 1: persona cards ---------- */
-  .lenses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0 8px; align-items: start; }
+  .lenses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0 32px; align-items: start; }
 .lenses img { display: block; width: 100%; height: auto; border-radius: 14px; }
 
   /* ---------- Component 2: sticky recommendation switcher ---------- */
@@ -253,11 +253,11 @@
 
   /* ---------- Component 3: recommendation + chat ---------- */
   .rec-panel[hidden] { display: none; }
-  .rec-head { padding: 32px 0 4px; }
-  .rec-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin: 0 0 10px; }
-  .rec-headline { font-size: 30px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; margin: 0; }
+  .rec-head { padding: 56px 0 4px; align-items: center; }
+  .rec-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin: 10 0 10px; }
+  .rec-headline { font-size: 30px; line-height: 1.2; font-weight: 700; letter-spacing: -.01em; margin: 0; text-align: center; }
 
-  .chat { display: flex; flex-direction: column; gap: 18px; margin: 28px 0 8px; }
+  .chat { display: flex; flex-direction: column; gap: 30px; margin: 56px 0 8px; }
   .msg { display: flex; align-items: flex-start; gap: 10px; max-width: 84%; --dx: -16px; }
   .msg.me { align-self: flex-end; flex-direction: row-reverse; --dx: 16px; }
   .avatar {
@@ -274,26 +274,44 @@
   .me .who { text-align: right; }
   .msg-bubble {
     padding: 12px 16px; border-radius: 16px 16px 16px 4px;
-    background: color-mix(in srgb, var(--c) 20%, var(--bg, #ffffff));
-    border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+    background: color-mix(in srgb, var(--c) 50%, var(--bg, #ffffff));
+    border: 1px solid color-mix(in srgb, var(--c) 45%, transparent);
     color: var(--ink);
   }
+.msg-body .msg-bubble + .msg-bubble { margin-top: 6px; }
+.me .msg-body { display: flex; flex-direction: column; align-items: flex-end; }
   .me .msg-bubble { border-radius: 16px 16px 4px 16px; }
-  .msg-bubble p { font-size: 15px; line-height: 1.55; margin: 0 0 8px; }
-  .msg-bubble p:last-child { margin-bottom: 0; }
+  .msg-bubble p { font-size: 15px; line-height: 1.55; margin: 0 0 16px; }
+  .msg-bubble p:last-child { margin-bottom: 30; }
 
   /* ---------- Component 4: takeaways ---------- */
-  .takeaways {
-    background: var(--soft); border: 1px solid var(--rule); border-left: 3px solid var(--orange);
-    border-radius: 0 14px 14px 0; padding: 18px 20px; margin: 32px 0 8px;
-  }
-  .takeaways .tk-title { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--orange); margin: 0 0 10px; }
-  .takeaways ul { display: flex; flex-direction: column; gap: 8px; }
-  .takeaways li { position: relative; padding-left: 20px; font-size: 15px; line-height: 1.55; }
-  .takeaways li::before { content: ""; position: absolute; left: 3px; top: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); }
+.takeaways { margin: 48px 0 8px; }
+
+.tk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.tk-card {
+  padding: 14px 16px; border-radius: 4px 4px 14px 14px;
+  background: color-mix(in srgb, var(--bg) 40%, var(--bg, #ffffff));
+  border: 1px solid color-mix(in srgb, var(--c) 20%, transparent);
+  border-top: 3px solid var(--c);
+}
+.tk-card p, .tk-shared p { font-size: 15px; line-height: 1.55; margin: 0; color: #191919; }
+.tk-who { font-size: 12px !important; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px !important; }
+
+.tk-shared {
+  margin-top: 20px; padding: 16px 20px;
+  background: var(--presenter); border: 1px solid var(--rule);
+  border-radius: 14px 14px 14px 14px;
+}
+/* individual cards: white text */
+.tk-card p,
+.tk-card .tk-who { color: #fff; }
+
+/* shared interest: black text */
+.tk-shared p,
+.tk-shared .tk-who { color: #000; }
   .rec-go {
     display: inline-block; margin-top: 18px; padding: 0; background: none; border: 0;
-    font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); cursor: pointer;
+    font: inherit; font-size: 15px; font-weight: 600; color: var(--bg); cursor: pointer;
   }
   .rec-go:hover { color: var(--orange); }
 
@@ -331,7 +349,7 @@
 
     <!-- ============ 1. UNDERSTANDING THE WHY ============ -->
     <section id="why">
-      <h2>Understanding the why</h2>
+      <h2>The Why behind it all</h2>
 <div class="callout"><p>In the previous section,while we were able to identify dark patterns and some questionable practices, we also thought it was important to understand what led to these decisions in the first place. Hence, we start this section by trying to understand the "why" behind some of the dark patterns.</p></div>
 
       <!-- ===== EXAMPLE 1 ===== -->
@@ -386,14 +404,14 @@
 
 <p>Understanding the pressures a company faces doesn’t justify every decision. It helps us recognise what drives these practices and where change might begin.</p>
 
-      <div class="callout"><p>These are our speculations about how these decisions were taken. They are not representative of Phonepe’s actual workings in any way.</p></div>
+      <div class="callout"><p>Disclaimer- These are our speculations about how these decisions were taken. They are not representative of Phonepe’s actual workings in any way.</p></div>
     </section>
 
     <hr>
 
     <!-- ============ 2. A PURPOSEFUL SHIFT ============ -->
     <section id="shift">
-      <h2>A "purposeful" shift</h2>
+      <h2>The "purposeful" shift</h2>
       <p>Many of these practices can emerge when <strong>financial growth and business metrics take precedence</strong> over other responsibilities.</p>
       
 
@@ -440,7 +458,7 @@
 
 <hr>
 <section id="recommend">
-      <h2>Recommending Change</h2>
+      <h2>The Recommendations</h2>
 <p>The needs identified for People, Planet and Purpose also helped us establish recommendations for Phonepe to have alternate routes where dark patterns currently exist.</p>
    
       <p>Click a strip to slide it open and see the recommendations for each need.</p>
@@ -503,7 +521,7 @@ Our Purpose recommendations make PhonePe honest.</p>
     <!-- ============ 4. PITCH IT! (hidden until the arrow or tab is clicked) ============ -->
     <section id="pitch" data-gated hidden>
 
-      <h2>Pitch it!</h2>
+      <h2>The Pitch</h2>
       <p>When we made recommendations based on the needs identified from People, Planet and Purpose, we couldn't help but wonder if they would still stand against the realities of a company. To reevaluate and strenghten our recommendations, we decided to bring the three lenses <strong>Ethical, Professional, and Design</strong> to our help. These then translated into 3 distinct departments in a company itself, as shown below.</p>
 
       <!-- ===== Component 1: the three lenses =====
@@ -527,22 +545,18 @@ Our Purpose recommendations make PhonePe honest.</p>
         </div>
       </div>
 
-      <!-- Placeholder copy: edit the recommendation text and dialogue freely.
-           Message pattern (copy to add more):
-           <div class="msg lens-legal" data-reveal> ...  (use lens-business / lens-design / "me lens-presenter") -->
-
+     
       <!-- ============ RECOMMENDATION 1 ============ -->
       <div class="rec-panel" id="rpanel-1" role="tabpanel" aria-labelledby="rtab-1">
         <div class="rec-head">
-          <p class="rec-eyebrow">Recommendation 1 · People</p>
-          <p class="rec-headline">Make leaving as easy as joining: exits and account deactivation should be free from unnecessary friction.</p>
+          <p class="rec-headline">Make account deactivation and service exit easy to find, clearly explained and achievable without unnecessary friction.</p>
         </div>
 
         <div class="chat">
           <div class="msg me lens-presenter" data-reveal>
             <div class="avatar" aria-hidden="true">P</div>
             <div class="msg-body"><span class="who">Presenter</span>
-              <div class="msg-bubble"><p>Our first recommendation: a clear “Deactivate account” option, with no hidden menus and no support call required to leave.</p></div></div>
+              <div class="msg-bubble"><p>Our first recommendation: a clear <strong>“Deactivate account”</strong> option, with no hidden menus and no support call required to leave. Users should have the <strong>freedom to disengage</strong> with dignity.</p></div></div>
           </div>
           <div class="msg lens-legal" data-reveal>
             <div class="avatar" aria-hidden="true">L</div>
@@ -552,8 +566,10 @@ Our Purpose recommendations make PhonePe honest.</p>
           <div class="msg me lens-presenter" data-reveal>
             <div class="avatar" aria-hidden="true">P</div>
             <div class="msg-body"><span class="who">Presenter</span>
-              <div class="msg-bubble"><p>Both can be true. Data protection principles point towards making withdrawal of consent as easy as giving it. Deactivation doesn’t have to mean deleting everything. We just need to say plainly what is retained, and why.</p></div></div>
+              <div class="msg-bubble"><p>Phonepe already has provisions related to <strong>account exit</strong> and <strong>retention clauses</strong> in its Privacy Policy. This proposed change would mean making the <strong>existing exit process clearer</strong> and revising the terms to explain what exit actually means.</p></div>
+<div class="msg-bubble"><p>Distinguishing between <strong>account deactivation</strong> and <strong>individual service termination</strong>, along with upfront legal and financial consequences of each should be explained for clarity. </p></div></div>
           </div>
+
           <div class="msg lens-business" data-reveal>
             <div class="avatar" aria-hidden="true">B</div>
             <div class="msg-body"><span class="who">Business</span>
@@ -562,91 +578,155 @@ Our Purpose recommendations make PhonePe honest.</p>
           <div class="msg me lens-presenter" data-reveal>
             <div class="avatar" aria-hidden="true">P</div>
             <div class="msg-body"><span class="who">Presenter</span>
-              <div class="msg-bubble"><p>Forced retention isn’t loyalty. Users who know they can leave freely are more likely to join, and more likely to return.</p></div></div>
+              <div class="msg-bubble"><p>Forced retention isn’t loyalty. Users who know they can leave freely are more likely to join, and more likely to return as well. By creating anticipatory help systems, Phonepe can have a differentiating factor in their service.</p></div></div>
           </div>
           <div class="msg lens-design" data-reveal>
             <div class="avatar" aria-hidden="true">D</div>
             <div class="msg-body"><span class="who">Design</span>
-              <div class="msg-bubble"><p>We can offer a “pause instead” option without guilt-tripping. One screen: what happens to your data, balance and linked accounts, then a clear confirm button. Alternatives sit beside the exit, never in front of it.</p></div></div>
+              <div class="msg-bubble"><p>We can offer a “pause instead” option without guilt-tripping. The screen can explain what happens to your data, balance and linked accounts, then offer a clear confirm button. This creates necessary friction while still allowing user agency.</p></div></div>
+          </div>
+    <div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>Occasional feedback systems can also help gather service specific data within routine usage, instead of asking users to list difficulties faced while leaving. Does this recommendation now cater to all?</p></div></div>
           </div>
           <div class="msg lens-legal" data-reveal>
             <div class="avatar" aria-hidden="true">L</div>
             <div class="msg-body"><span class="who">Legal</span>
-              <div class="msg-bubble"><p>I can support that, as long as the retention notice is accurate and reviewed.</p></div></div>
+              <div class="msg-bubble"><p>Yes, we can support that, as long as the data retention notice is accurate and reviewed.</p></div></div>
           </div>
         </div>
 
-        <div class="takeaways" data-reveal>
-          <p class="tk-title">Takeaways</p>
-          <ul>
-            <li>Legal’s concern is about <strong>what we keep and say</strong>, not about whether exits should exist.</li>
-            <li>Business objections soften when retention is reframed as <strong>trust</strong> rather than lock-in.</li>
-            <li>Design makes the compromise real: alternatives are offered <strong>beside</strong> the exit, never in its way.</li>
-          </ul>
-        </div>
+<hr>
+       <div class="takeaways" data-reveal>
+  <p><h3>Takeaways</h3></p>
+
+  <div class="tk-grid">
+    <div class="tk-card lens-legal">
+      <p class="tk-who">Legal</p>
+      <p>Cares about helping PhonePe communicate its obligations accurately and reduce ambiguity about what closure entails.</p>
+    </div>
+    <div class="tk-card lens-business">
+      <p class="tk-who">Business</p>
+      <p>Cares about helping PhonePe identify recurring problems, improve the experience and retain users who can generate considerable revenue.</p>
+    </div>
+    <div class="tk-card lens-design">
+      <p class="tk-who">Design</p>
+      <p>Cares about user confidence, building trust and smooth a user experience across the platform.</p>
+    </div>
+  </div>
+
+  <div class="tk-shared">
+    <p class="tk-who">Shared interest</p>
+    <p>Trust that supports voluntary participation</p>
+<p>All stakeholders benefit when the relationship between the platform and its users is clear, informed and sustainable.</p>
+<p> -Users retain control over whether they continue using the service.</p>
+<p> -PhonePe can learn from voluntary feedback and address the reasons people leave.</p>
+<p> -Legal and design teams can support a process that communicates obligations accurately and implements them clearly.</p>
+<p><strong>The shared interest is in building a service people choose to continue using, supported by trust rather than friction.</strong></p>
+  </div>
+</div>
         <button class="rec-go" type="button" data-rec-go="2">Next: Recommendation 2 →</button>
       </div>
 
       <!-- ============ RECOMMENDATION 2 ============ -->
       <div class="rec-panel" id="rpanel-2" role="tabpanel" aria-labelledby="rtab-2" hidden>
-        <div class="rec-head">
-          <p class="rec-eyebrow">Recommendation 2 · Planet</p>
-          <p class="rec-headline">Anticipate user problems and offer diverse query paths, so energy-hungry AI support isn’t spent on dead ends.</p>
+      <div class="rec-head">
+          <p class="rec-headline">A period of inactivity should not automatically trigger increasingly persuasive incentives. Remind users of inactive services, and give them a choice to opt out before turning to penalties.</p>
         </div>
 
         <div class="chat">
           <div class="msg me lens-presenter" data-reveal>
             <div class="avatar" aria-hidden="true">P</div>
             <div class="msg-body"><span class="who">Presenter</span>
-              <div class="msg-bubble"><p>Chatbots use a lot of energy, yet users often hit a dead end and start over. We recommend surfacing likely issues first and giving the chatbot more ways to resolve a query.</p></div></div>
+              <div class="msg-bubble"><p>We propose reminding users about inactive services and giving them a clear choice to continue, pause or opt out before any penalties apply.</p></div></div>
           </div>
           <div class="msg lens-business" data-reveal>
             <div class="avatar" aria-hidden="true">B</div>
             <div class="msg-body"><span class="who">Business</span>
-              <div class="msg-bubble"><p>Is this a sustainability project or a support-cost project? If engagement is low, why not simply remove the chatbot?</p></div></div>
+              <div class="msg-bubble"><p>But inactivity means we're losing engagement. Incentives like cashback can bring users back. If we make opting out easier, aren't we encouraging more people to leave?</p></div></div>
           </div>
           <div class="msg me lens-presenter" data-reveal>
             <div class="avatar" aria-hidden="true">P</div>
             <div class="msg-body"><span class="who">Presenter</span>
-              <div class="msg-bubble"><p>It’s both, and removal just moves the problem. A dead end means the same issue is raised again, then escalated to a human. That is wasted compute and wasted support time.</p></div></div>
+              <div class="msg-bubble"><p>We can still encourage users to return. The concern is when incentives escalate simply because someone hasn't responded, rather than because the service offers them genuine value. We should give users a reason to return, not make ignoring us increasingly costly.</p></div></div>
           </div>
+<div class="msg lens-legal" data-reveal>
+            <div class="avatar" aria-hidden="true">L</div>
+            <div class="msg-body"><span class="who">Legal</span>
+              <div class="msg-bubble"><p>And what happens if the user has overlooked a service that carries an inactivity charge? Are we expected to keep reminding them indefinitely?</p></div></div>
+          </div>
+<div class="msg me lens-presenter" data-reveal>
+            <div class="avatar" aria-hidden="true">P</div>
+            <div class="msg-body"><span class="who">Presenter</span>
+              <div class="msg-bubble"><p>We can establish a reasonable notification schedule, clearly explain the consequences of remaining inactive, and provide an opportunity to opt out before charges begin. Any applicable charges and their conditions should be disclosed upfront.</p></div></div>
+          </div>
+
           <div class="msg lens-design" data-reveal>
             <div class="avatar" aria-hidden="true">D</div>
             <div class="msg-body"><span class="who">Design</span>
-              <div class="msg-bubble"><p>Put the common problems up front, such as failed payments and refund status, so many people never need to type. The chatbot becomes the fallback, with a visible route to a human.</p></div></div>
+              <div class="msg-bubble"><p>We could introduce a neutral inactivity reminder showing which service is inactive, whether any charges apply, and what the user can do next. This gives them enough information to take appropriate steps.</p></div></div>
           </div>
-          <div class="msg lens-legal" data-reveal>
-            <div class="avatar" aria-hidden="true">L</div>
-            <div class="msg-body"><span class="who">Legal</span>
-              <div class="msg-bubble"><p>If the bot explains refunds or responsibility, the wording matters. Escalation paths and who answers for what need to be documented.</p></div></div>
-          </div>
+          
           <div class="msg lens-business" data-reveal>
             <div class="avatar" aria-hidden="true">B</div>
             <div class="msg-body"><span class="who">Business</span>
-              <div class="msg-bubble"><p>Can we measure whether it works?</p></div></div>
+              <div class="msg-bubble"><p>What if users ignore the reminders anyway? We still need to cover the costs of maintaining services that nobody uses.</p></div></div>
           </div>
           <div class="msg me lens-presenter" data-reveal>
             <div class="avatar" aria-hidden="true">P</div>
             <div class="msg-body"><span class="who">Presenter</span>
-              <div class="msg-bubble"><p>Yes: queries per resolved issue, repeat-contact rate and handoff rate. Fewer retries means lower energy use and lower cost.</p></div></div>
+              <div class="msg-bubble"><p>That’s fair. We should distinguish between legitimate costs of maintaining a service and penalties designed to drive re-engagement. Where a charge is genuinely necessary, it should be proportionate, transparent and communicated in advance, rather than used as a way to force users back.</p></div></div>
           </div>
+<div class="msg lens-legal" data-reveal>
+            <div class="avatar" aria-hidden="true">L</div>
+            <div class="msg-body"><span class="who">Legal</span>
+              <div class="msg-bubble"><p>Okay. That could work. We need to define the notification schedule, applicable service charges and any mandatory retention obligations beforehand.</p></div></div>
+          </div>
+
         </div>
 
+
         <div class="takeaways" data-reveal>
-          <p class="tk-title">Takeaways</p>
-          <ul>
-            <li>Sustainability lands best when it is tied to a <strong>metric the business already tracks</strong>.</li>
-            <li>Preventing the problem beats optimising the chatbot that answers it.</li>
-            <li>A visible human handoff is good design <strong>and</strong> good risk management.</li>
-          </ul>
-        </div>
+  <p class="tk-title">Takeaways</p>
+
+  <div class="tk-grid">
+    <div class="tk-card lens-legal">
+      <p class="tk-who">Legal</p>
+      <p>Cares about distinguishing legitimate service charges from penalties that pressure users into re-engaging, ensuring that any charges are proportionate, justified and communicated in advance.</p>
+    </div>
+    <div class="tk-card lens-business">
+      <p class="tk-who">Business</p>
+      <p>Cares about recovering the costs of maintaining inactive services and reactivating users, while distinguishing genuine customer interest from engagement driven.</p>
+    </div>
+    <div class="tk-card lens-design">
+      <p class="tk-who">Design</p>
+      <p>Cares about preserving user agency, allowing users to review, pause or deactivate services without being pushed towards continued use.</p>
+    </div>
+  </div>
+
+  <div class="tk-shared">
+    <p class="tk-who">Shared interest</p>
+    <p>Managing inactivity without manufacturing engagement
+
+All stakeholders benefit when inactivity is addressed in a way that accounts for the costs of maintaining a service without treating user disengagement as a problem that must be reversed.
+
+-Users can decide whether an inactive service still serves their needs before incurring charges.
+
+-PhonePe can distinguish between users who need a reminder, users who want to leave and services that are no longer useful.
+
+-Legal, business and design can establish a fair process for handling inactivity without relying on pressure to sustain engagement.
+
+<strong>The shared interest is in managing the lifecycle of a service responsibly, rather than treating every inactive user as a lost customer to win back.</strong></p>
+  </div>
+</div>
         <button class="rec-go" type="button" data-rec-go="3">Next: Recommendation 3 →</button>
       </div>
 
       <!-- ============ RECOMMENDATION 3 ============ -->
       <div class="rec-panel" id="rpanel-3" role="tabpanel" aria-labelledby="rtab-3" hidden>
         <div class="rec-head">
-          <p class="rec-eyebrow">Recommendation 3 · Purpose</p>
+      
           <p class="rec-headline">Show changes to terms that affect users upfront: in the app, in good time, and in plain language.</p>
         </div>
 
@@ -689,13 +769,28 @@ Our Purpose recommendations make PhonePe honest.</p>
         </div>
 
         <div class="takeaways" data-reveal>
-          <p class="tk-title">Takeaways</p>
-          <ul>
-            <li>“We published it” is a <strong>legal</strong> position. “Users saw it” is a <strong>trust</strong> position.</li>
-            <li>Tiering notices answers Business’s fear of friction without hiding what matters.</li>
-            <li>Each lens changed the proposal, and the final version is stronger for it.</li>
-          </ul>
-        </div>
+  <p class="tk-title">Takeaways</p>
+
+  <div class="tk-grid">
+    <div class="tk-card lens-legal">
+      <p class="tk-who">Legal</p>
+      <p>What Legal cares about in this recommendation.</p>
+    </div>
+    <div class="tk-card lens-business">
+      <p class="tk-who">Business</p>
+      <p>What Business cares about in this recommendation.</p>
+    </div>
+    <div class="tk-card lens-design">
+      <p class="tk-who">Design</p>
+      <p>What Design cares about in this recommendation.</p>
+    </div>
+  </div>
+
+  <div class="tk-shared">
+    <p class="tk-who">Shared interest</p>
+    <p>The common ground all three departments agreed on.</p>
+  </div>
+</div>
       </div>
 
     </section>
