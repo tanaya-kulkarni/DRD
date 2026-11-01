@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digitally responsible design principles</title>
+<style>
+  :root { --ink:#000; --muted:#6a6a6a; --rule:#e7e5e2; --orange:#d9480f; --soft:#f5f4f2; --bg:#fff;
+    --legal:#BBA4E9; --business:#FEBD8D; --design:#9BAF96; --people:#9cc3d8; --planet:#8fb9a1; --purpose:#e8b3aa; }
+  html[data-theme="dark"] { --ink:#f1f1ef; --muted:#9b9a97; --rule:#3a3a3a; --orange:#ff7a3d; --bg:#191919; --soft:#252525;
+    --people:#b7d3e3; --planet:#7a9e8b; --purpose:#f2cfc9; }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  html, body { margin:0; background:var(--bg); }
+  body { padding:8px 4px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); }
+  .layout { max-width:760px; margin:0 auto; }
+  h1 { font-size:30px; line-height:1.2; font-weight:700; letter-spacing:-.01em; margin:24px 0 14px; }
+  p { font-size:16px; line-height:1.65; margin:0 0 14px; }
+  .muted { color:var(--muted); }
+  .callout { background:var(--soft); border-left:2px solid var(--orange); padding:14px 16px; margin:20px 0 0; border-radius:0 4px 4px 0; }
+  .callout p { margin:0; font-size:15px; color:var(--muted); }
+
+  /* sticky switcher (same look as the recommendation switcher) */
+  .subnav { position:sticky; top:0; z-index:10; background:var(--bg); margin:28px 0 0; padding:10px 0; border-bottom:1px solid var(--rule); }
+  .tabs { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; padding:4px; background:var(--soft); border:1px solid var(--rule); border-radius:12px; }
+  .tab { appearance:none; border:0; background:transparent; cursor:pointer; padding:10px 12px; border-radius:9px; font:inherit; font-size:14px; line-height:1.3; color:var(--muted); transition:background .2s ease,color .2s ease; }
+  .tab:hover { color:var(--ink); }
+  .tab[aria-selected="true"] { background:var(--orange); color:#fff; font-weight:600; }
+  .tab:focus-visible,.next:focus-visible { outline:2px solid var(--orange); outline-offset:2px; }
+  .tab .short { display:none; }
+  .panel[hidden] { display:none; }
+
+  /* principle heading: muted number, bold title */
+  .p-head { padding-top:56px; display:flex; align-items:baseline; gap:16px; }
+  .p-num { font-size:56px; line-height:1; font-weight:700; color:var(--muted); opacity:.45; font-variant-numeric:tabular-nums; }
+  .p-title { font-size:40px; line-height:1.1; font-weight:700; letter-spacing:-.02em; margin:0; }
+  .p-sub { color:var(--muted); margin:12px 0 0; }
+
+  /* three stacked boxes */
+  .boxes { display:flex; flex-direction:column; gap:14px; margin:32px 0 8px; }
+  .box { border-radius:14px; padding:16px 20px; color:#111; border:1px solid var(--c); background:color-mix(in srgb,var(--c) 35%,white); }
+  .box p { margin:0; font-size:17px; line-height:1.55; }
+  .box .box-label { font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin:0 0 6px; color:#444; }
+  .believe { --c:var(--people); } .will { --c:var(--planet); } .instead { --c:var(--purpose); }
+
+  .ethos-title { font-size:24px; line-height:1.25; font-weight:700; letter-spacing:-.01em; margin:56px 0 8px; }
+  .ops { display:flex; flex-direction:column; gap:22px; margin:28px 0 8px; }
+  .op { display:flex; align-items:flex-start; gap:10px; max-width:88%; --dx:-16px; }
+  .op:nth-child(even) { align-self:flex-end; flex-direction:row-reverse; --dx:16px; }
+  .op:nth-child(even) .op-body { display:flex; flex-direction:column; align-items:flex-end; }
+  .lens-legal { --c:var(--legal); } .lens-business { --c:var(--business); } .lens-design { --c:var(--design); }
+  .avatar { flex:none; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--c); color:#111; font-size:13px; font-weight:700; }
+  .op-body { min-width:0; }
+  .who { display:block; margin:0 4px 5px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .op-bubble { padding:12px 16px; border-radius:16px 16px 16px 4px; background:color-mix(in srgb,var(--c) 50%,var(--bg)); border:1px solid color-mix(in srgb,var(--c) 45%,transparent); }
+  .op:nth-child(even) .op-bubble { border-radius:16px 16px 4px 16px; }
+  .op-bubble p { font-size:15px; line-height:1.55; margin:0; }
+  .next { display:inline-block; margin-top:28px; padding:0; background:none; border:0; font:inherit; font-size:15px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .next:hover { color:var(--orange); }
+
+  @keyframes fade-up { from { opacity:0; transform:translate(var(--dx,0),14px); } to { opacity:1; transform:none; } }
+  .is-ready [data-reveal]:not(.is-in) { opacity:0; }
+  .is-ready [data-reveal].is-in { animation:fade-up .5s cubic-bezier(.2,.7,.2,1) both; }
+  @media (max-width:640px) {
+    .tab { padding:10px 6px; } .tab .long { display:none; } .tab .short { display:inline; }
+    .p-head { padding-top:28px; gap:10px; } .p-num { font-size:40px; } .p-title { font-size:28px; }
+    .op { max-width:96%; gap:8px; } .avatar { width:28px; height:28px; font-size:12px; }
+  }
+  @media (prefers-reduced-motion:reduce) { .is-ready [data-reveal]:not(.is-in) { opacity:1; } .is-ready [data-reveal].is-in { animation:none; } }
+</style>
+</head>
+<body>
+<div class="layout" id="principles">
+  <h1>Digitally responsible design principles</h1>
+  <p class="muted">Drawing on everything we learned from our recommendations and the interests we found we share, these are the principles we drafted to guide digitally responsible design. Each one is paired with the ethos statements we each commit to.</p>
+
+  <div class="subnav"><div class="tabs" role="tablist" aria-label="Design principles"><button class="tab" type="button" role="tab" id="tab-1" aria-controls="panel-1" aria-selected="true"> </span><span class="short">P</span>1. <span class="long">Consent</button><button class="tab" type="button" role="tab" id="tab-2" aria-controls="panel-2" aria-selected="false" tabindex=-1> </span><span class="short">P</span>2. <span class="long">Freedom </button><button class="tab" type="button" role="tab" id="tab-3" aria-controls="panel-3" aria-selected="false" tabindex=-1> </span><span class="short">P</span>3. <span class="long">Accountability</button><button class="tab" type="button" role="tab" id="tab-4" aria-controls="panel-4" aria-selected="false" tabindex=-1> </span><span class="short">P</span>4. <span class="long">Transparency</button></div></div>
+
+    <div class="panel" id="panel-1" role="tabpanel" aria-labelledby="tab-1">
+      <div class="p-head"><span class="p-num" aria-hidden="true">01</span><h2 class="p-title">The right to Informed Consent</h2></div>
+      <p class="p-sub">Defining the gap between informed and formal consent.</p>
+      <div class="boxes">
+        <div class="box believe" data-reveal><p class="box-label">We believe</p><p>Agreeing to a service is meaningful only when people can anticipate the important consequences of that agreement, including costs and obligations that arise later.</p></div>
+        <div class="box will" data-reveal><p class="box-label">So we will</p><p>Identify and present relevant future consequences when users are taking significant financial decisions</p></div>
+        <div class="box instead" data-reveal><p class="box-label">Instead of</p><p>Treating a user's initial acceptance of lengthy terms as sufficient consent for consequences they may encounter much later.</p></div>
+      </div>
+      <h3 class="ethos-title">Ethos statements to uphold the principle</h3>
+      <p class="muted">Each of us has written what upholding this principle means to us personally.</p>
+      <div class="ops">
+        <div class="op lens-legal" data-reveal><div class="avatar" aria-hidden="true">L</div>
+          <div class="op-body"><span class="who">Tanaya</span><div class="op-bubble"><p><strong>I will</strong> advocate for making consequential conditions visible and understandable before users commit.</p>
+<p><strong>Even when</strong> simplifying the journey would improve conversion rates</p>
+<p><strong>Which has cost me</strong> the simplicity of a designed flow and smooth opting in for services for my users</p></div></div></div>
+        <div class="op lens-business" data-reveal><div class="avatar" aria-hidden="true">B</div>
+          <div class="op-body"><span class="who">Dhun</span><div class="op-bubble"><p><strong>I will</strong> ask what a person is really agreeing to, and what it could mean for them later, before I decide how the agreement looks.</p>
+<p><strong>Even when</strong> I’m not the one making the call and the push for a shorter flow comes quietly, as “that’s how it’s always done.”</p>
+<p><strong>Which has cost me</strong> 1) being seen as someone who complicates simple decisions, and 2) extra rounds of review just to get consequences onto the screen.</p></div></div></div>
+        <div class="op lens-design" data-reveal><div class="avatar" aria-hidden="true">D</div>
+          <div class="op-body"><span class="who">Siddhi</span><div class="op-bubble"><p><strong>I will</strong> make sure the thing people are most likely to regret missing (important terms) doesn’t get lost in a wall of text they’ll just scroll past.</p>
+<p><strong>Even when</strong> that means the screen looks shorter than a normal terms page.</p>
+<p><strong>Which has cost me</strong> the easy excuse of “it was written somewhere”. I have to actually decide what’s worth showing.</p></div></div></div>
+      </div>
+      <button class="next" type="button" data-go="2">Next: Principle 2 →</button>
+    </div>
+    <div class="panel" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+      <div class="p-head"><span class="p-num" aria-hidden="true">02</span><h2 class="p-title">The freedom to disengage</h2></div>
+      <p class="p-sub">Reducing dependence on user engagement as the sole success metric</p>
+      <div class="boxes">
+        <div class="box believe" data-reveal><p class="box-label">We believe</p><p>a product earns continued use through the value it provides; a user's attention, inactivity or decision to leave should not become leverage against them.</p></div>
+        <div class="box will" data-reveal><p class="box-label">So we will</p><p>communicate genuine consequences upfront, support the transfer or retrieval of user information where appropriate, and ensure that retention efforts do not pressure a user's decision to leave.</p></div>
+        <div class="box instead" data-reveal><p class="box-label">Instead of</p><p>using friction, financial penalties or increasingly persuasive incentives to preserve engagement regardless of the user's intentions.</p></div>
+      </div>
+      <h3 class="ethos-title">Ethos statements to uphold the principle</h3>
+      <p class="muted">Each of us has written what upholding this principle means to us personally.</p>
+      <div class="ops">
+        <div class="op lens-legal" data-reveal><div class="avatar" aria-hidden="true">L</div>
+          <div class="op-body"><span class="who">Tanaya</span><div class="op-bubble"><p><strong>I will</strong> challenge design decisions that make it harder for users to leave or reduce their participation</p>
+<p><strong>Even when</strong> adding friction could improve retention metrics and on paper engagement</p>
+<p><strong>Which has cost me</strong> perceived loss of business due to design, and reliance on lagging indicators for success</p></div></div></div>
+        <div class="op lens-business" data-reveal><div class="avatar" aria-hidden="true">B</div>
+          <div class="op-body"><span class="who">Dhun</span><div class="op-bubble"><p><strong>I will</strong> treat a person’s decision to leave as something worth designing well, not a failure to recover from</p>
+<p><strong>Even when</strong> the metrics my team is measured on depend on people staying, and I may not have the standing to question them.</p>
+<p><strong>Which has cost me</strong> time spent making a case for an exit nobody asked me to improve.</p></div></div></div>
+        <div class="op lens-design" data-reveal><div class="avatar" aria-hidden="true">D</div>
+          <div class="op-body"><span class="who">Siddhi</span><div class="op-bubble"><p><strong>I will</strong> put the “leave” or “pause” button somewhere people can actually find it, not hidden two menus deep.</p>
+<p><strong>Even when</strong> growth numbers would look better if people had to dig around to quit.</p>
+<p><strong>Which has cost me</strong> a nicer-looking retention chart.</p></div></div></div>
+      </div>
+      <button class="next" type="button" data-go="3">Next: Principle 3 →</button>
+    </div>
+    <div class="panel" id="panel-3" role="tabpanel" aria-labelledby="tab-3" hidden>
+      <div class="p-head"><span class="p-num" aria-hidden="true">03</span><h2 class="p-title">Anticipatory Support systems</h2></div>
+      <p class="p-sub">Defining accountability and creating anticipatory help routes</p>
+      <div class="boxes">
+        <div class="box believe" data-reveal><p class="box-label">We believe</p><p>When a product brings together multiple service providers, users deserve clarity on who is responsible for each part of their experience, especially when something goes wrong.</p></div>
+        <div class="box will" data-reveal><p class="box-label">So we will</p><p>Clearly identify third-party providers, distinguish their responsibilities from the platform's own, and guide users to the appropriate support and resolution process when an issue arises.</p></div>
+        <div class="box instead" data-reveal><p class="box-label">Instead of</p><p>Leaving users to identify which provider is responsible, navigate disconnected support systems, or determine who can resolve their issue on their own.</p></div>
+      </div>
+      <h3 class="ethos-title">Ethos statements to uphold the principle</h3>
+      <p class="muted">Each of us has written what upholding this principle means to us personally.</p>
+      <div class="ops">
+        <div class="op lens-legal" data-reveal><div class="avatar" aria-hidden="true">L</div>
+          <div class="op-body"><span class="who">Tanaya</span><div class="op-bubble"><p><strong>I will</strong> advocate for clear paths to resolution and avoiding dead ends</p>
+<p><strong>Even when</strong> a problem falls outside the product team's or company's direct responsibility</p>
+<p><strong>Which has cost me</strong> additional time, coordination with other teams, or the convenience of drawing a clear boundary around my role.</p></div></div></div>
+        <div class="op lens-business" data-reveal><div class="avatar" aria-hidden="true">B</div>
+          <div class="op-body"><span class="who">Dhun</span><div class="op-bubble"><p><strong>I will</strong> work out who is responsible for each part of an experience before deciding how seamless it should feel</p>
+<p><strong>Even when</strong> the partnerships behind it are shaped by agreements I can’t see and the brief asks for one unified brand.</p>
+<p><strong>Which has cost me</strong> 1) friction with partners or colleagues who would rather stay in the background, and 2) a less polished interface.</p></div></div></div>
+        <div class="op lens-design" data-reveal><div class="avatar" aria-hidden="true">D</div>
+          <div class="op-body"><span class="who">Siddhi</span><div class="op-bubble"><p><strong>I will</strong> show people exactly who to contact if something goes wrong, before it goes wrong, not after.</p>
+<p><strong>Even when</strong> that makes the app feel less like one smooth, all-in-one experience.</p>
+<p><strong>Which has cost me</strong> that polished feeling of everything being handled by us alone.</p></div></div></div>
+      </div>
+      <button class="next" type="button" data-go="4">Next: Principle 4 →</button>
+    </div>
+    <div class="panel" id="panel-4" role="tabpanel" aria-labelledby="tab-4" hidden>
+      <div class="p-head"><span class="p-num" aria-hidden="true">04</span><h2 class="p-title">Transparency in data usage</h2></div>
+      <p class="p-sub">Distinguishing between legal obligations and business purposes for data sharing</p>
+      <div class="boxes">
+        <div class="box believe" data-reveal><p class="box-label">We believe</p><p>People should be able to understand why their data is retained and how it is used, without having to distinguish legal obligations from business choices buried in broad privacy terms themselves.</p></div>
+        <div class="box will" data-reveal><p class="box-label">So we will</p><p>Clearly distinguish data practices required by law from those used for personalisation, marketing and service improvement, explaining their purposes, applicable retention periods and available user choices.</p></div>
+        <div class="box instead" data-reveal><p class="box-label">Instead of</p><p>Grouping different data practices under vague, blanket explanations that leave users uncertain about what the platform must do, what it chooses to do, and what control they have.</p></div>
+      </div>
+      <h3 class="ethos-title">Ethos statements to uphold the principle</h3>
+      <p class="muted">Each of us has written what upholding this principle means to us personally.</p>
+      <div class="ops">
+        <div class="op lens-legal" data-reveal><div class="avatar" aria-hidden="true">L</div>
+          <div class="op-body"><span class="who">Tanaya</span><div class="op-bubble"><p><strong>I will</strong> question data practices whose purposes or necessity remain unclear</p>
+<p><strong>Even when</strong> they are legally permissible or commercially valuable</p>
+<p><strong>Which has cost me</strong> the convenience of accepting existing practices and revenue opportunities from data sharing</p></div></div></div>
+        <div class="op lens-business" data-reveal><div class="avatar" aria-hidden="true">B</div>
+          <div class="op-body"><span class="who">Dhun</span><div class="op-bubble"><p><strong>I will</strong> ask whether a data practice is required of us or chosen by us before I help explain it</p>
+<p><strong>Even when</strong> the reasoning sits with legal or business teams and the honest answer may be hard to get.</p>
+<p><strong>Which has cost me</strong> 1) time spent chasing answers before I can design anything, and 2) being seen as stepping into decisions that aren’t “design’s” to make.</p></div></div></div>
+        <div class="op lens-design" data-reveal><div class="avatar" aria-hidden="true">D</div>
+          <div class="op-body"><span class="who">Siddhi</span><div class="op-bubble"><p><strong>I will</strong> tag every data request with a plain label like “required by law” or “optional, helps us personalise” which will help people take better decisions.</p>
+<p><strong>Even when</strong> that makes it obvious how much data collection isn’t actually required.</p>
+<p><strong>Which has cost me</strong> some of the data my team is used to getting by default.</p></div></div></div>
+      </div>
+      
+    </div>
+</div>
+<script>
+(function () {
+  var THEME = "dark"; // "light" or "dark"
+  document.documentElement.setAttribute("data-theme", THEME);
+  var root = document.getElementById("principles");
+  var tabs = [].slice.call(root.querySelectorAll(".tab"));
+  var panels = [].slice.call(root.querySelectorAll(".panel"));
+  var bar = root.querySelector(".subnav");
+  function show(i, focus) {
+    tabs.forEach(function (t, n) { var on = n === i; t.setAttribute("aria-selected", on); t.tabIndex = on ? 0 : -1; panels[n].hidden = !on; });
+    if (focus) tabs[i].focus();
+    var top = panels[i].getBoundingClientRect().top + window.pageYOffset - bar.offsetHeight - 8;
+    if (window.pageYOffset > top) window.scrollTo({ top: Math.max(0, top) });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { show(i); });
+    t.addEventListener("keydown", function (e) {
+      var n = null;
+      if (e.key === "ArrowRight") n = (i + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") n = (i + tabs.length - 1) % tabs.length;
+      else if (e.key === "Home") n = 0; else if (e.key === "End") n = tabs.length - 1;
+      if (n !== null) { e.preventDefault(); show(n, true); }
+    });
+  });
+  root.querySelectorAll("[data-go]").forEach(function (b) { b.addEventListener("click", function () { show(+b.getAttribute("data-go") - 1); }); });
+  var items = [].slice.call(root.querySelectorAll("[data-reveal]"));
+  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) { items.forEach(function (el) { el.classList.add("is-in"); }); }
+  else {
+    root.classList.add("is-ready");
+    var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } }); }, { threshold: .15, rootMargin: "0px 0px -8% 0px" });
+    items.forEach(function (el) { io.observe(el); });
+  }
+})();
+</script>
+</body>
+</html>
